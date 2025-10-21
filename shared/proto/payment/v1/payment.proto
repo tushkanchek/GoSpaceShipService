@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package payment.v1;
+
+
+option go_package = "back/GoSpaceShipService/shared/pkg/proto/payment/payment_v1";
+
+//service to pay for the order
+service PaymentService{
+    rpc PayOrder(PayOrderRequest) returns (PayOrderResponse);
+}
+
+//Request for method PayOrder
+message PayOrderRequest{
+    string order_uuid = 1;
+    string user_uuid = 2;
+    string payment_method = 3;
+}
+
+//Response for method PayOrder
+message PayOrderResponse{
+    string transaction_uuid = 1;
+}

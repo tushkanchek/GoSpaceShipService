@@ -1,0 +1,15 @@
+OrderStatus:
+  type: string
+  description: Статус заказа
+  enum:
+    - UNKNOWN
+    - PENDING_PAYMENT
+    - PAID
+    - CANCELLED
+  x-enum-descriptions:
+    - Неизвестный способ оплаты
+    - Оплата банковской картой
+    - Оплата через СБП
+    - Оплата кредитной картой
+    - Оплата средствами инвестора
+  example: PENDING_PAYMENT

@@ -1,0 +1,14 @@
+PaymentMethod:
+  type: string
+  description: Способ оплаты
+  enum:
+    - UNKNOWN
+    - CARD
+    - SBP
+    - CREDIT_CARD
+    - INVESTOR_MONEY
+  x-enum-descriptions:
+    - Неизвестный статус заказа
+    - Ожидающий оплату статус заказа
+    - Оплаченный статус заказа
+  example: CARD

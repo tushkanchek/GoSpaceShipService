@@ -1,0 +1,16 @@
+type: object
+required:
+  - order_uuid
+  - total_price
+properties:
+  order_uuid:
+    type: string
+    description: uuid созданного заказа
+    minLength: 1
+    maxLength: 100
+    example: "89f6083a-76dd-4547-b56b-638c6629666a"
+  total_price:
+    type: number
+    format: float
+    description: итоговая сумма заказа
+    example : 66666666.61

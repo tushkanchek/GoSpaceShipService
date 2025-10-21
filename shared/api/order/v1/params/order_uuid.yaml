@@ -1,0 +1,9 @@
+name: order_uuid
+in: path
+required: true
+description: uuid заказа который запрашивается на оплату
+schema:
+  type: string
+  minLength: 1
+  maxLength: 100
+  example: "89f6083a-76ae-4547-b56b-638c5829727c"
