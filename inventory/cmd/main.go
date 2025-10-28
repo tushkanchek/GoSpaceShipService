@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	partRepository "inventory/internal/repository/part"
-	partService "inventory/internal/service/part"
-	partAPI "inventory/internal/api/part/v1"
 	"log"
 	"net"
 	"os"
@@ -13,12 +10,14 @@ import (
 	"sync"
 	"syscall"
 
-	inventoryV1 "shared/pkg/proto/inventory/v1"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+	partAPI "inventory/internal/api/part/v1"
+	partRepository "inventory/internal/repository/part"
+	partService "inventory/internal/service/part"
+	inventoryV1 "shared/pkg/proto/inventory/v1"
 )
 
 const grpcPort = 50051
@@ -126,8 +125,6 @@ func anyMatch(tags, filter []string) bool {
 	return false
 }
 
-
-
 func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
@@ -146,9 +143,8 @@ func main() {
 	service := partService.NewService(repo)
 	api := partAPI.NewAPI(service)
 
-	
 	inventoryV1.RegisterInventoryServiceServer(s, api)
-	
+
 	// Включаем рефлексию для отладки
 	reflection.Register(s)
 
