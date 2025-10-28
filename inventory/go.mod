@@ -1,6 +1,6 @@
 module inventory
 
-go 1.24.0
+go 1.25.3
 
 require (
 	github.com/google/uuid v1.6.0
@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/brianvoe/gofakeit/v7 v7.8.0
+	github.com/samber/lo v1.52.0
 	google.golang.org/grpc v1.76.0
 )
 
