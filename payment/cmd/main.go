@@ -1,17 +1,17 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net"
 	"os"
 	"os/signal"
+	paymentService "payment/internal/service/payment"
+	paymentAPI "payment/internal/api/payment/v1"
 	paymentV1 "shared/pkg/proto/payment/v1"
 	"syscall"
 
 	"fmt"
 
-	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -26,15 +26,6 @@ const (
 
 type PaymentService struct{
 	paymentV1.UnimplementedPaymentServiceServer
-}
-
-//TODO: validate PaymentMethod
-func (s *PaymentService) PayOrder(_ context.Context, req *paymentV1.PayOrderRequest) (*paymentV1.PayOrderResponse, error){
-	transaction_uuid := uuid.NewString()
-	log.Printf("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid)
-	return &paymentV1.PayOrderResponse{
-		TransactionUuid: transaction_uuid,
-	}, nil
 }
 
 
@@ -52,9 +43,10 @@ func main(){
 	
 	s:=grpc.NewServer()
 
-	service := &PaymentService{}
+	service := paymentService.NewService()
+	api := paymentAPI.NewAPI(service)
 
-	paymentV1.RegisterPaymentServiceServer(s, service)
+	paymentV1.RegisterPaymentServiceServer(s, api)
 
 	reflection.Register(s)
 
