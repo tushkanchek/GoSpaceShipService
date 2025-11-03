@@ -13,7 +13,7 @@ import (
 
 func (a *api) PayOrder(ctx context.Context, req *paymentV1.PayOrderRequest) (*paymentV1.PayOrderResponse, error){
 	
-	transaction_uuid, err := a.paymentService.PayOrder(ctx, req.OrderUuid, req.UserUuid, req.PaymentMethod)
+	transaction_uuid, err := a.paymentService.PayOrder(ctx, req.OrderUuid, req.UserUuid, req.PaymentMethod.String())
 
 	if err!=nil{
 		if errors.Is(err, model.ErrEmptyOrderUuid) {

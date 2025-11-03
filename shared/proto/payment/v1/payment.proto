@@ -14,10 +14,19 @@ service PaymentService{
 message PayOrderRequest{
     string order_uuid = 1;
     string user_uuid = 2;
-    string payment_method = 3;
+    PaymentMethod payment_method = 3;
 }
 
 //Response for method PayOrder
 message PayOrderResponse{
     string transaction_uuid = 1;
 }
+
+//Supported payment methods
+enum PaymentMethod {
+    PAYMENT_METHOD_UNSPECIFIED = 0;     
+    PAYMENT_METHOD_CARD = 1;     
+    PAYMENT_METHOD_SBP = 2;       
+    PAYMENT_METHOD_CREDIT_CARD = 3;     
+    PAYMENT_METHOD_INVESTOR_MONEY = 4;        
+}     
