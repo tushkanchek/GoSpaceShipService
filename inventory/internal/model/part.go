@@ -12,6 +12,23 @@ const (
 	CategoryWing     Category = 4
 )
 
+
+
+type Part struct{
+	Uuid 			string
+	Name			string
+	Description		string
+	Price			float64
+	StockQuantity	int64
+	Category		Category
+	Dimensions		*Dimensions
+	Manufacturer	*Manufacturer
+	Tags			[]string
+	Metadata		map[string]Value //TODO: type any instead of value
+	CreatedAt		*time.Time
+	UpdatedAt		*time.Time
+}
+
 type Dimensions struct{
 	Length		float64
 	Width		float64
@@ -31,22 +48,6 @@ type Value struct {
 	DoubleValue *float64
 	BoolValue   *bool
 }
-
-type Part struct{
-	Uuid 			string
-	Name			string
-	Description		string
-	Price			float64
-	StockQuantity	int64
-	Category		Category
-	Dimensions		*Dimensions
-	Manufacturer	*Manufacturer
-	Tags			[]string
-	Metadata		map[string]Value //TODO: type any instead of value
-	CreatedAt		*time.Time
-	UpdatedAt		*time.Time
-}
-
 
 type PartsFilter struct {
 	Uuids                 []string          
