@@ -9,9 +9,7 @@ import (
 	"syscall"
 
 	"google.golang.org/grpc"
-	
 	"google.golang.org/grpc/reflection"
-	
 	partAPI "inventory/internal/api/part/v1"
 	partRepository "inventory/internal/repository/part"
 	partService "inventory/internal/service/part"
@@ -19,7 +17,6 @@ import (
 )
 
 const grpcPort = 50051
-
 
 func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))

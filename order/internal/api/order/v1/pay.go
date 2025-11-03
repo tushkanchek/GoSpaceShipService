@@ -6,43 +6,35 @@ import (
 
 	"order/internal/converter"
 	"order/internal/model"
-
 	orderV1 "shared/pkg/openapi/order/v1"
 )
 
-
-
-
-func (a *api) PayOrder(ctx context.Context, req *orderV1.PayOrderRequest, params orderV1.PayOrderParams) (orderV1.PayOrderRes, error){
+func (a *api) PayOrder(ctx context.Context, req *orderV1.PayOrderRequest, params orderV1.PayOrderParams) (orderV1.PayOrderRes, error) {
 	transaction_uuid, err := a.service.PayOrder(ctx, converter.PaymentMethodApiToModel(req.PaymentMethod), params.OrderUUID)
-	if err!=nil{
-		switch err{
+	if err != nil {
+		switch err {
 		case model.ErrOrderNotFound:
 			return &orderV1.NotFoundError{
-				Code: http.StatusNotFound,
+				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}, nil
-		
+
 		case model.ErrPayOrderStatusPaid, model.ErrPayOrderStatusPaid, model.ErrEmptyOrderUuid:
 			return &orderV1.BadRequestError{
-				Code: http.StatusBadRequest,
+				Code:    http.StatusBadRequest,
 				Message: err.Error(),
 			}, nil
 		default:
 			return &orderV1.BadRequestError{
-				Code: http.StatusInternalServerError,
+				Code:    http.StatusInternalServerError,
 				Message: "pay order pay unexpected error: " + err.Error(),
 			}, nil
 		}
-	
-
 	}
 	return &orderV1.PayOrderResponse{
 		TransactionUUID: transaction_uuid,
 	}, nil
-
 }
-
 
 // func (h *OrderHandler) PayOrder(ctx context.Context, req *orderV1.PayOrderRequest, params orderV1.PayOrderParams) (orderV1.PayOrderRes, error) {
 // 	order := h.storage.GetOrder(params.OrderUUID)

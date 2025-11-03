@@ -5,14 +5,12 @@ import (
 	paymentV1 "shared/pkg/proto/payment/v1"
 )
 
-
-
-type api struct{
+type api struct {
 	paymentV1.UnimplementedPaymentServiceServer
 	paymentService service.PaymentService
 }
 
-func NewAPI(paymentServce service.PaymentService) *api{
+func NewAPI(paymentServce service.PaymentService) *api {
 	return &api{
 		paymentService: paymentServce,
 	}

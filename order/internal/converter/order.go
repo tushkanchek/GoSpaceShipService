@@ -3,12 +3,9 @@ package converter
 import (
 	"order/internal/model"
 	orderV1 "shared/pkg/openapi/order/v1"
-
-
 )
 
-
-func OrderToApi(order *model.Order) *orderV1.Order{
+func OrderToApi(order *model.Order) *orderV1.Order {
 	var transactionUUID orderV1.OptString
 	if order.TransactionUUID != nil {
 		transactionUUID = orderV1.NewOptString(*order.TransactionUUID)
@@ -20,16 +17,15 @@ func OrderToApi(order *model.Order) *orderV1.Order{
 		paymentMethod = orderV1.NewOptPaymentMethod(pm)
 	}
 	return &orderV1.Order{
-		OrderUUID: order.OrderUUID,
-		UserUUID: order.OrderUUID,
-		PartUuids: order.PartUuids,
-		TotalPrice: float32(order.TotalPrice),
+		OrderUUID:       order.OrderUUID,
+		UserUUID:        order.OrderUUID,
+		PartUuids:       order.PartUuids,
+		TotalPrice:      float32(order.TotalPrice),
 		TransactionUUID: transactionUUID,
-		PaymentMethod: paymentMethod,
-		Status: orderV1.OrderStatus(order.OrderStatus),
+		PaymentMethod:   paymentMethod,
+		Status:          orderV1.OrderStatus(order.OrderStatus),
 	}
 }
-
 
 func PaymentMethodApiToModel(method orderV1.PaymentMethod) model.PaymentMethod {
 	switch method {
@@ -59,5 +55,4 @@ func PaymentMethodModelToApi(method model.PaymentMethod) orderV1.PaymentMethod {
 	default:
 		return orderV1.PaymentMethodUNKNOWN
 	}
-
 }

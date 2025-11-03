@@ -6,6 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/render v1.0.3
 	github.com/google/uuid v1.6.0
+	github.com/samber/lo v1.52.0
 	google.golang.org/grpc v1.76.0
 )
 

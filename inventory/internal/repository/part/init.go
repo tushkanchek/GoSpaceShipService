@@ -1,15 +1,14 @@
 package part
 
 import (
-	repoModel "inventory/internal/repository/model"
 	"math"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
+	repoModel "inventory/internal/repository/model"
 )
-
 
 func (r *repository) initParts() {
 	parts := generateParts()
@@ -111,7 +110,7 @@ func generateMetadataValue() any {
 	case 1:
 		return int64(gofakeit.Number(1, 100))
 	case 2:
-		return roundTo(gofakeit.Float64Range(1, 100))		
+		return roundTo(gofakeit.Float64Range(1, 100))
 	case 3:
 		return gofakeit.Bool()
 	default:

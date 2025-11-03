@@ -5,15 +5,13 @@ import (
 	inventoryV1 "shared/pkg/proto/inventory/v1"
 )
 
-
 var _ def.InventoryClient = (*client)(nil)
 
-type client struct{
+type client struct {
 	generatedClient inventoryV1.InventoryServiceClient
 }
 
-
-func NewClient(generatedClient inventoryV1.InventoryServiceClient) *client{
+func NewClient(generatedClient inventoryV1.InventoryServiceClient) *client {
 	return &client{
 		generatedClient: generatedClient,
 	}

@@ -3,37 +3,35 @@ package v1
 import (
 	"context"
 	"net/http"
+
 	"order/internal/model"
 	orderV1 "shared/pkg/openapi/order/v1"
 )
 
-
-
-func (a *api) CreateOrder(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.CreateOrderRes, error){
+func (a *api) CreateOrder(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.CreateOrderRes, error) {
 	order, err := a.service.CreateOrder(ctx, req.UserUUID, req.PartUuids)
-	if err!=nil{
-		switch err{
+	if err != nil {
+		switch err {
 		case model.ErrOrderAlreadyExists, model.ErrEmptyUserUuid, model.ErrEmptyListPartUuids:
-			return &orderV1.BadRequestError{  //TODO: return make it conflict error
-				Code: http.StatusBadRequest,
+			return &orderV1.BadRequestError{ // TODO: return make it conflict error
+				Code:    http.StatusBadRequest,
 				Message: err.Error(),
 			}, nil
 		case model.ErrPartsByUuidsNotFound:
 			return &orderV1.NotFoundError{
-				Code: http.StatusNotFound,
+				Code:    http.StatusNotFound,
 				Message: err.Error(),
-		}, nil	
+			}, nil
 		}
 	}
 
 	return &orderV1.CreateOrderResponse{
-		OrderUUID: order.OrderUUID,
+		OrderUUID:  order.OrderUUID,
 		TotalPrice: float32(order.TotalPrice),
 	}, nil
-
 }
 
-//func (h *OrderHandler) CreateOrder(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.CreateOrderRes, error) {
+// func (h *OrderHandler) CreateOrder(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.CreateOrderRes, error) {
 // 	resp, err := h.inventoryClient.ListParts(
 // 		ctx,
 // 		&inventoryV1.ListPartsRequest{

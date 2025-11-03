@@ -1,13 +1,13 @@
 package order
 
 import (
-	repoModel "order/internal/repository/model"
 	"sync"
+
 	def "order/internal/repository"
+	repoModel "order/internal/repository/model"
 )
 
 var _ def.OrderRepository = (*repository)(nil)
-
 
 type repository struct {
 	mu     sync.RWMutex

@@ -2,11 +2,11 @@ package part
 
 import (
 	"context"
-	model "inventory/internal/model"
-	repoModel "inventory/internal/repository/model"
-	repoConverter "inventory/internal/repository/converter"
-)
 
+	model "inventory/internal/model"
+	repoConverter "inventory/internal/repository/converter"
+	repoModel "inventory/internal/repository/model"
+)
 
 func (r *repository) ListParts(_ context.Context, Filter *repoModel.PartsFilter) ([]*model.Part, error) {
 	r.mu.Lock()

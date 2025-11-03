@@ -6,18 +6,9 @@ import (
 	"log"
 	"net"
 	"net/http"
-	orderV1API "order/internal/api/order/v1"
-	clientInventory "order/internal/client/grpc/inventory/v1"
-	clientPayment "order/internal/client/grpc/payment/v1"
-	repoOrder "order/internal/repository/order"
 	"os"
 	"os/signal"
-	orderV1 "shared/pkg/openapi/order/v1"
-	inventoryV1 "shared/pkg/proto/inventory/v1"
-	paymentV1 "shared/pkg/proto/payment/v1"
 	"syscall"
-
-	serviceOrder "order/internal/service/order"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -25,44 +16,47 @@ import (
 	"github.com/go-chi/render"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	orderV1API "order/internal/api/order/v1"
+	clientInventory "order/internal/client/grpc/inventory/v1"
+	clientPayment "order/internal/client/grpc/payment/v1"
+	repoOrder "order/internal/repository/order"
+	serviceOrder "order/internal/service/order"
+	orderV1 "shared/pkg/openapi/order/v1"
+	inventoryV1 "shared/pkg/proto/inventory/v1"
+	paymentV1 "shared/pkg/proto/payment/v1"
 )
-
 
 const (
 	httpPort          = "8080"
 	readHeaderTimeout = 5 * time.Second
 	shutdownTimeout   = 10 * time.Second
-	inventoryAdress = "50051"
-	paymentAdress = "50052"
+	inventoryAdress   = "50051"
+	paymentAdress     = "50052"
 )
 
-
 func main() {
-	
-
 	invConn, err := grpc.NewClient(
-		"localhost:"+ inventoryAdress, 
+		"localhost:"+inventoryAdress,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
-	if err!=nil{
+	if err != nil {
 		log.Printf("Failed connect to inventory: %v\n", err)
 		os.Exit(1)
 	}
 
 	invClient := inventoryV1.NewInventoryServiceClient(invConn)
-	
 
 	payConn, err := grpc.NewClient(
-		"localhost:"+paymentAdress, 
+		"localhost:"+paymentAdress,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
-	if err!=nil{
+	if err != nil {
 		log.Printf("Failed connect to payment: %v\n", err)
 		os.Exit(1)
 	}
 
 	payClient := paymentV1.NewPaymentServiceClient(payConn)
-	
+
 	gprcInventory := clientInventory.NewClient(invClient)
 
 	gprcPayment := clientPayment.NewClient(shutdownTimeout, payClient)
@@ -72,7 +66,7 @@ func main() {
 	repo := repoOrder.NewOrderRepository()
 
 	service := serviceOrder.NewService(repo, gprcInventory, gprcPayment)
-	
+
 	api := orderV1API.NewAPI(service)
 
 	orderServer, err := orderV1.NewServer(api)

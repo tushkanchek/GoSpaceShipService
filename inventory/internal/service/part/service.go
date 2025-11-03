@@ -5,13 +5,9 @@ import (
 	def "inventory/internal/service"
 )
 
-
-
-
 var _ def.InventoryService = (*service)(nil)
 
-
-type service struct{
+type service struct {
 	inventoryRepository repository.InventoryRepository
 }
 

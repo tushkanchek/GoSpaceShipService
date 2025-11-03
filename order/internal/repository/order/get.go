@@ -2,10 +2,10 @@ package order
 
 import (
 	"context"
+
 	model "order/internal/model"
 	"order/internal/repository/converter"
 )
-
 
 func (r *repository) GetOrder(_ context.Context, order_uuid string) (*model.Order, error) {
 	r.mu.RLock()

@@ -1,47 +1,41 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"os/signal"
-	paymentService "payment/internal/service/payment"
-	paymentAPI "payment/internal/api/payment/v1"
-	paymentV1 "shared/pkg/proto/payment/v1"
 	"syscall"
-
-	"fmt"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	paymentAPI "payment/internal/api/payment/v1"
+	paymentService "payment/internal/service/payment"
+	paymentV1 "shared/pkg/proto/payment/v1"
 )
-
-
-
 
 const (
 	grpcPort = 50052
 )
 
-
-type PaymentService struct{
+type PaymentService struct {
 	paymentV1.UnimplementedPaymentServiceServer
 }
 
-
-func main(){
+func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
-	if err!=nil{
+	if err != nil {
 		log.Printf("Failed to listen: %v\n", err)
 		return
 	}
-	defer func(){
-		if cerr:=lis.Close();cerr!=nil{
+	defer func() {
+		if cerr := lis.Close(); cerr != nil {
 			log.Printf("Failed to close listener: %v\n", cerr)
 		}
 	}()
-	
-	s:=grpc.NewServer()
+
+	s := grpc.NewServer()
 
 	service := paymentService.NewService()
 	api := paymentAPI.NewAPI(service)
@@ -67,4 +61,3 @@ func main(){
 	s.GracefulStop()
 	log.Println("✅ Server stopped")
 }
-

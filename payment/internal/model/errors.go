@@ -2,7 +2,6 @@ package model
 
 import "errors"
 
-
 var (
 	ErrEmptyOrderUuid = errors.New("order uuid is empty")
 

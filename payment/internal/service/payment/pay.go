@@ -3,18 +3,17 @@ package payment
 import (
 	"context"
 	"log"
-	"payment/internal/model"
 
 	"github.com/google/uuid"
+	"payment/internal/model"
 )
 
-
-func (s *service) PayOrder(_ context.Context, orderUuid string, userUuid string, PaymentMethod string) (string, error){
+func (s *service) PayOrder(_ context.Context, orderUuid, userUuid, PaymentMethod string) (string, error) {
 	if orderUuid == "" {
 		return "", model.ErrEmptyOrderUuid
 	}
 
-	if userUuid == ""{
+	if userUuid == "" {
 		return "", model.ErrEmptyUserUuid
 	}
 

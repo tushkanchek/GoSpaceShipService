@@ -2,7 +2,6 @@ package model
 
 import "errors"
 
-
 var (
 	ErrOrderAlreadyExists = errors.New("order with this uuid already exists")
 
