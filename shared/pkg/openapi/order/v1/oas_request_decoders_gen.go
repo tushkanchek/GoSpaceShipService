@@ -85,7 +85,7 @@ func (s *Server) decodeCreateOrderRequest(r *http.Request) (
 	}
 }
 
-func (s *Server) decodeOrderPayRequest(r *http.Request) (
+func (s *Server) decodePayOrderRequest(r *http.Request) (
 	req *PayOrderRequest,
 	close func() error,
 	rerr error,

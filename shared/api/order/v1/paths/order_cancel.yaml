@@ -3,7 +3,7 @@ parameters:
 
 post:
   summary: cancel order by order_uuid
-  operationId: OrderCancel
+  operationId: CancelOrder
   tags:
     - Order
   responses:
@@ -21,6 +21,12 @@ post:
         application/json:
           schema:
             $ref: '../components/errors/conflict_error.yaml'
+    '400':
+      description: Bad request - validation error
+      content:
+        application/json:
+          schema:
+            $ref: '../components/errors/bad_request_error.yaml'
     '500':
       description: Internal Server error
       content:

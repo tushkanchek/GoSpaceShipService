@@ -40,9 +40,15 @@ func (s *BadRequestError) SetMessage(val string) {
 	s.Message = val
 }
 
+func (*BadRequestError) cancelOrderRes()    {}
 func (*BadRequestError) createOrderRes()    {}
 func (*BadRequestError) getOrderByUUIDRes() {}
-func (*BadRequestError) orderPayRes()       {}
+func (*BadRequestError) payOrderRes()       {}
+
+// CancelOrderNoContent is response for CancelOrder operation.
+type CancelOrderNoContent struct{}
+
+func (*CancelOrderNoContent) cancelOrderRes() {}
 
 // Ref: #/components/schemas/conflict_error
 type ConflictError struct {
@@ -72,7 +78,7 @@ func (s *ConflictError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*ConflictError) orderCancelRes() {}
+func (*ConflictError) cancelOrderRes() {}
 
 // Ref: #/components/schemas/create_order_request
 type CreateOrderRequest struct {
@@ -231,10 +237,10 @@ func (s *InternalServerError) SetMessage(val string) {
 	s.Message = val
 }
 
+func (*InternalServerError) cancelOrderRes()    {}
 func (*InternalServerError) createOrderRes()    {}
 func (*InternalServerError) getOrderByUUIDRes() {}
-func (*InternalServerError) orderCancelRes()    {}
-func (*InternalServerError) orderPayRes()       {}
+func (*InternalServerError) payOrderRes()       {}
 
 // Ref: #/components/schemas/not_found_error
 type NotFoundError struct {
@@ -264,10 +270,10 @@ func (s *NotFoundError) SetMessage(val string) {
 	s.Message = val
 }
 
+func (*NotFoundError) cancelOrderRes()    {}
 func (*NotFoundError) createOrderRes()    {}
 func (*NotFoundError) getOrderByUUIDRes() {}
-func (*NotFoundError) orderCancelRes()    {}
-func (*NotFoundError) orderPayRes()       {}
+func (*NotFoundError) payOrderRes()       {}
 
 // NewOptInt returns new OptInt with value set to v.
 func NewOptInt(v int) OptInt {
@@ -493,11 +499,6 @@ func (s *Order) SetStatus(val OrderStatus) {
 	s.Status = val
 }
 
-// OrderCancelNoContent is response for OrderCancel operation.
-type OrderCancelNoContent struct{}
-
-func (*OrderCancelNoContent) orderCancelRes() {}
-
 // Статус заказа.
 // Ref: #/components/schemas/OrderStatus
 type OrderStatus string
@@ -586,7 +587,7 @@ func (s *PayOrderResponse) SetTransactionUUID(val string) {
 	s.TransactionUUID = val
 }
 
-func (*PayOrderResponse) orderPayRes() {}
+func (*PayOrderResponse) payOrderRes() {}
 
 // Способ оплаты.
 // Ref: #/components/schemas/PaymentMethod
