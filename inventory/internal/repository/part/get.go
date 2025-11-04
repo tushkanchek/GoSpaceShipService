@@ -8,9 +8,6 @@ import (
 )
 
 func (r *repository) GetPart(_ context.Context, partUuid string) (*model.Part, error) {
-	if len(partUuid) == 0 {
-		return nil, model.ErrPartUUIDIsEmpty
-	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
