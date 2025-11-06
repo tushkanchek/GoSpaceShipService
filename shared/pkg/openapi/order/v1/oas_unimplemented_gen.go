@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// CancelOrder implements CancelOrder operation.
+//
+// Cancel order by order_uuid.
+//
+// POST /api/v1/orders/{order_uuid}/cancel
+func (UnimplementedHandler) CancelOrder(ctx context.Context, params CancelOrderParams) (r CancelOrderRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // CreateOrder implements CreateOrder operation.
 //
 // Create order for a user with some parts.
@@ -31,21 +40,12 @@ func (UnimplementedHandler) GetOrderByUUID(ctx context.Context, params GetOrderB
 	return r, ht.ErrNotImplemented
 }
 
-// OrderCancel implements OrderCancel operation.
-//
-// Cancel order by order_uuid.
-//
-// POST /api/v1/orders/{order_uuid}/cancel
-func (UnimplementedHandler) OrderCancel(ctx context.Context, params OrderCancelParams) (r OrderCancelRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// OrderPay implements OrderPay operation.
+// PayOrder implements PayOrder operation.
 //
 // Pay the order, change OrderStatus and PaymentMethod.
 //
 // POST /api/v1/orders/{order_uuid}/pay
-func (UnimplementedHandler) OrderPay(ctx context.Context, req *PayOrderRequest, params OrderPayParams) (r OrderPayRes, _ error) {
+func (UnimplementedHandler) PayOrder(ctx context.Context, req *PayOrderRequest, params PayOrderParams) (r PayOrderRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

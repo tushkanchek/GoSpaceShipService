@@ -1,0 +1,35 @@
+#with-expecter: true
+#boilerplate-file: ".mockery_boilerplate_text.txt"
+dir: "{{.InterfaceDir}}/mocks"
+filename: "mock_{{.InterfaceName}}.go"
+pkgname: "mocks"
+structname: "{{.InterfaceName}}"
+#resolve-type-alias: false
+#issue-845-fix: true
+
+
+packages:
+  inventory/internal/service:
+    config:
+      include-interface-regex: ".*Service"
+
+  inventory/internal/repository:
+    config:
+      include-interface-regex: ".*Repository"
+
+  order/internal/service:
+    config:
+      include-interface-regex: ".*Service"
+
+  order/internal/repository:
+    config:
+      include-interface-regex:  ".*Repository"
+
+  order/internal/client/grpc:
+    config:
+      include-interface-regex:  ".*(PaymentClient|InventoryClient)"
+
+  payment/internal/service:
+    config:
+      include-interface-regex:  ".*Service"
+  

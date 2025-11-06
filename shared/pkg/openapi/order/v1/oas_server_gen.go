@@ -8,6 +8,12 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// CancelOrder implements CancelOrder operation.
+	//
+	// Cancel order by order_uuid.
+	//
+	// POST /api/v1/orders/{order_uuid}/cancel
+	CancelOrder(ctx context.Context, params CancelOrderParams) (CancelOrderRes, error)
 	// CreateOrder implements CreateOrder operation.
 	//
 	// Create order for a user with some parts.
@@ -20,18 +26,12 @@ type Handler interface {
 	//
 	// GET /api/v1/orders/{order_uuid}
 	GetOrderByUUID(ctx context.Context, params GetOrderByUUIDParams) (GetOrderByUUIDRes, error)
-	// OrderCancel implements OrderCancel operation.
-	//
-	// Cancel order by order_uuid.
-	//
-	// POST /api/v1/orders/{order_uuid}/cancel
-	OrderCancel(ctx context.Context, params OrderCancelParams) (OrderCancelRes, error)
-	// OrderPay implements OrderPay operation.
+	// PayOrder implements PayOrder operation.
 	//
 	// Pay the order, change OrderStatus and PaymentMethod.
 	//
 	// POST /api/v1/orders/{order_uuid}/pay
-	OrderPay(ctx context.Context, req *PayOrderRequest, params OrderPayParams) (OrderPayRes, error)
+	PayOrder(ctx context.Context, req *PayOrderRequest, params PayOrderParams) (PayOrderRes, error)
 	// NewError creates *GenericErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.

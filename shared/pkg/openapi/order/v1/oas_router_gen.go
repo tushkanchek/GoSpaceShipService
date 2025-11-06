@@ -122,7 +122,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleOrderCancelRequest([1]string{
+								s.handleCancelOrderRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -144,7 +144,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "POST":
-								s.handleOrderPayRequest([1]string{
+								s.handlePayOrderRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -319,9 +319,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "POST":
-								r.name = OrderCancelOperation
+								r.name = CancelOrderOperation
 								r.summary = "cancel order by order_uuid"
-								r.operationID = "OrderCancel"
+								r.operationID = "CancelOrder"
 								r.pathPattern = "/api/v1/orders/{order_uuid}/cancel"
 								r.args = args
 								r.count = 1
@@ -343,9 +343,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "POST":
-								r.name = OrderPayOperation
+								r.name = PayOrderOperation
 								r.summary = "Pay the order, change OrderStatus and PaymentMethod"
-								r.operationID = "OrderPay"
+								r.operationID = "PayOrder"
 								r.pathPattern = "/api/v1/orders/{order_uuid}/pay"
 								r.args = args
 								r.count = 1

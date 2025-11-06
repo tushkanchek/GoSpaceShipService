@@ -3,7 +3,7 @@ parameters:
 
 post:
   summary: Pay the order, change OrderStatus and PaymentMethod
-  operationId: OrderPay
+  operationId: PayOrder
   tags:
     - Order
   requestBody:

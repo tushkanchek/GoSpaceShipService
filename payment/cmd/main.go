@@ -1,60 +1,46 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"os/signal"
-	paymentV1 "shared/pkg/proto/payment/v1"
 	"syscall"
 
-	"fmt"
-
-	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	paymentAPI "payment/internal/api/payment/v1"
+	paymentService "payment/internal/service/payment"
+	paymentV1 "shared/pkg/proto/payment/v1"
 )
-
-
-
 
 const (
 	grpcPort = 50052
 )
 
-
-type PaymentService struct{
+type PaymentService struct {
 	paymentV1.UnimplementedPaymentServiceServer
 }
 
-//TODO: validate PaymentMethod
-func (s *PaymentService) PayOrder(_ context.Context, req *paymentV1.PayOrderRequest) (*paymentV1.PayOrderResponse, error){
-	transaction_uuid := uuid.NewString()
-	log.Printf("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid)
-	return &paymentV1.PayOrderResponse{
-		TransactionUuid: transaction_uuid,
-	}, nil
-}
-
-
-func main(){
+func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
-	if err!=nil{
+	if err != nil {
 		log.Printf("Failed to listen: %v\n", err)
 		return
 	}
-	defer func(){
-		if cerr:=lis.Close();cerr!=nil{
+	defer func() {
+		if cerr := lis.Close(); cerr != nil {
 			log.Printf("Failed to close listener: %v\n", cerr)
 		}
 	}()
-	
-	s:=grpc.NewServer()
 
-	service := &PaymentService{}
+	s := grpc.NewServer()
 
-	paymentV1.RegisterPaymentServiceServer(s, service)
+	service := paymentService.NewService()
+	api := paymentAPI.NewAPI(service)
+
+	paymentV1.RegisterPaymentServiceServer(s, api)
 
 	reflection.Register(s)
 
@@ -75,4 +61,3 @@ func main(){
 	s.GracefulStop()
 	log.Println("✅ Server stopped")
 }
-
