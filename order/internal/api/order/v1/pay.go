@@ -10,7 +10,7 @@ import (
 )
 
 func (a *api) PayOrder(ctx context.Context, req *orderV1.PayOrderRequest, params orderV1.PayOrderParams) (orderV1.PayOrderRes, error) {
-	transaction_uuid, err := a.service.PayOrder(ctx, converter.PaymentMethodApiToModel(req.PaymentMethod), params.OrderUUID)
+	transaction_uuid, err := a.service.PayOrder(ctx, params.OrderUUID, converter.PaymentMethodApiToModel(req.PaymentMethod))
 	if err != nil {
 		switch err {
 		case model.ErrOrderNotFound:

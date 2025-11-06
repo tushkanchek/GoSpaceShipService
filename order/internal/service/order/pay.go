@@ -7,7 +7,7 @@ import (
 )
 
 // TODO: check orderstatus cancel
-func (s *service) PayOrder(ctx context.Context, PaymentMethod model.PaymentMethod, order_uuid string) (string, error) {
+func (s *service) PayOrder(ctx context.Context, order_uuid string, PaymentMethod model.PaymentMethod) (string, error) {
 	if order_uuid == "" {
 		return "", model.ErrEmptyOrderUuid
 	}
