@@ -1,20 +1,25 @@
 package part
 
 import (
+	"context"
+	"log"
 	"math"
 	"time"
+
+	repoModel "inventory/internal/repository/model"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
-	repoModel "inventory/internal/repository/model"
 )
 
 func (r *repository) initParts() {
 	parts := generateParts()
 
 	for _, part := range parts {
-		r.data[part.Uuid] = part
+		if _, err := r.collection.InsertOne(context.Background(), *part); err!=nil{
+			log.Printf("failed to insert part %s: %v", part.Uuid, err)
+		}
 	}
 }
 
