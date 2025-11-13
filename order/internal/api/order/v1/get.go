@@ -8,10 +8,19 @@ import (
 	"order/internal/converter"
 	"order/internal/model"
 	orderV1 "shared/pkg/openapi/order/v1"
+
+	"github.com/google/uuid"
 )
 
 func (a *api) GetOrderByUUID(ctx context.Context, params orderV1.GetOrderByUUIDParams) (orderV1.GetOrderByUUIDRes, error) {
-	order, err := a.service.GetOrderByUUID(ctx, params.OrderUUID)
+	order_uuid, err := uuid.Parse(params.OrderUUID)
+	if err!=nil{
+		return &orderV1.BadRequestError{
+				Code:    http.StatusBadRequest,
+				Message: "Order uuid couldn;t be parsed",
+			}, nil
+		}
+	order, err := a.service.GetOrderByUUID(ctx, order_uuid)
 	if err != nil {
 		if errors.Is(err, model.ErrEmptyOrderUuid) {
 			return &orderV1.BadRequestError{

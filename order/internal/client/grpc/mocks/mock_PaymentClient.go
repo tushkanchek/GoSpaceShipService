@@ -8,6 +8,7 @@ import (
 	"context"
 	"order/internal/model"
 
+	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -39,22 +40,24 @@ func (_m *PaymentClient) EXPECT() *PaymentClient_Expecter {
 }
 
 // PayOrder provides a mock function for the type PaymentClient
-func (_mock *PaymentClient) PayOrder(ctx context.Context, orderUuid string, userUuid string, paymentMethod model.PaymentMethod) (string, error) {
+func (_mock *PaymentClient) PayOrder(ctx context.Context, orderUuid string, userUuid string, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
 	ret := _mock.Called(ctx, orderUuid, userUuid, paymentMethod)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PayOrder")
 	}
 
-	var r0 string
+	var r0 uuid.UUID
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, model.PaymentMethod) (string, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, model.PaymentMethod) (uuid.UUID, error)); ok {
 		return returnFunc(ctx, orderUuid, userUuid, paymentMethod)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, model.PaymentMethod) string); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string, model.PaymentMethod) uuid.UUID); ok {
 		r0 = returnFunc(ctx, orderUuid, userUuid, paymentMethod)
 	} else {
-		r0 = ret.Get(0).(string)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(uuid.UUID)
+		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string, model.PaymentMethod) error); ok {
 		r1 = returnFunc(ctx, orderUuid, userUuid, paymentMethod)
@@ -106,12 +109,12 @@ func (_c *PaymentClient_PayOrder_Call) Run(run func(ctx context.Context, orderUu
 	return _c
 }
 
-func (_c *PaymentClient_PayOrder_Call) Return(s string, err error) *PaymentClient_PayOrder_Call {
-	_c.Call.Return(s, err)
+func (_c *PaymentClient_PayOrder_Call) Return(uUID uuid.UUID, err error) *PaymentClient_PayOrder_Call {
+	_c.Call.Return(uUID, err)
 	return _c
 }
 
-func (_c *PaymentClient_PayOrder_Call) RunAndReturn(run func(ctx context.Context, orderUuid string, userUuid string, paymentMethod model.PaymentMethod) (string, error)) *PaymentClient_PayOrder_Call {
+func (_c *PaymentClient_PayOrder_Call) RunAndReturn(run func(ctx context.Context, orderUuid string, userUuid string, paymentMethod model.PaymentMethod) (uuid.UUID, error)) *PaymentClient_PayOrder_Call {
 	_c.Call.Return(run)
 	return _c
 }

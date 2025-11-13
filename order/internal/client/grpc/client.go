@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"order/internal/model"
+
+	"github.com/google/uuid"
 )
 
 type PaymentClient interface {
-	PayOrder(ctx context.Context, orderUuid, userUuid string, paymentMethod model.PaymentMethod) (string, error)
+	PayOrder(ctx context.Context, orderUuid, userUuid string, paymentMethod model.PaymentMethod) (uuid.UUID, error)
 }
 
 type InventoryClient interface {

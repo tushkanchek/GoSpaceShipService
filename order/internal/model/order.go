@@ -1,5 +1,9 @@
 package model
 
+import "github.com/google/uuid"
+
+
+
 type PaymentMethod int32
 
 const (
@@ -20,11 +24,14 @@ const (
 )
 
 type Order struct {
-	OrderUUID       string
-	UserUUID        string
-	PartUuids       []string
+	OrderUUID       uuid.UUID
+	UserUUID        uuid.UUID
+	PartUuids       []uuid.UUID
 	TotalPrice      float64
 	TransactionUUID *string
 	PaymentMethod   *PaymentMethod
 	OrderStatus     OrderStatus
 }
+
+
+

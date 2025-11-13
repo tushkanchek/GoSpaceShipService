@@ -4,15 +4,16 @@ import (
 	"order/internal/model"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 )
 
 
 
 
 func (s *ServiceSuite) TestPayOrderSucces() {
-	orderUuid := gofakeit.UUID()
+	orderUuid := uuid.MustParse(gofakeit.UUID())
 
-	userUuid := gofakeit.UUID()
+	userUuid := uuid.MustParse(gofakeit.UUID())
 
 	paymentMethod := model.PaymentMethodCARD
 
@@ -33,20 +34,20 @@ func (s *ServiceSuite) TestPayOrderSucces() {
 	}
 
 	s.orderRepo.On("GetOrder", s.ctx, orderUuid).Return(order, nil).Once()
-	s.paymentClient.On("PayOrder", s.ctx, orderUuid, userUuid, paymentMethod).Return(transaction_uuid, nil).Once()
-	s.orderRepo.On("UpdateOrder", s.ctx, orderPaid).Return(nil).Once()
+	s.paymentClient.On("PayOrder", s.ctx, orderUuid.String(), userUuid.String(), paymentMethod).Return(uuid.MustParse(transaction_uuid), nil).Once()
+	s.orderRepo.On("UpdateOrder", s.ctx, orderPaid).Return(nil)
 
 	result, err := s.service.PayOrder(s.ctx, orderUuid, paymentMethod)
 
 	s.NoError(err)
-	s.Equal(transaction_uuid, result)
+	s.Equal(transaction_uuid, result.String())
 }
 
 
 
 
 func (s *ServiceSuite) TestPayOrderEmptyOrderUuid() {
-	orderUuid := ""
+	orderUuid := uuid.Nil
 
 	paymentMethod := model.PaymentMethodCARD
 

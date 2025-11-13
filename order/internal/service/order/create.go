@@ -7,16 +7,20 @@ import (
 	model "order/internal/model"
 )
 
-func (s *service) CreateOrder(ctx context.Context, user_uuid string, part_uuids []string) (*model.Order, error) {
-	if user_uuid == "" {
+func (s *service) CreateOrder(ctx context.Context, user_uuid uuid.UUID, part_uuids []uuid.UUID) (*model.Order, error) {
+	if user_uuid == uuid.Nil {
 		return nil, model.ErrEmptyUserUuid
 	}
 	if len(part_uuids) == 0 {
 		return nil, model.ErrEmptyListPartUuids
 	}
 
+	invPartUuids := make([]string, 0, len(part_uuids))
+	for _, elem := range part_uuids{
+		invPartUuids = append(invPartUuids, elem.String())
+	}
 	resp, err := s.InventoryClient.ListParts(ctx, &model.PartsFilter{
-		Uuids: part_uuids,
+		Uuids: invPartUuids,
 	})
 	if len(resp) == 0 {
 		return nil, model.ErrPartsByUuidsNotFound
@@ -31,7 +35,7 @@ func (s *service) CreateOrder(ctx context.Context, user_uuid string, part_uuids 
 	}
 
 	order := &model.Order{
-		OrderUUID:   uuid.NewString(),
+		OrderUUID:   uuid.MustParse(uuid.NewString()),
 		UserUUID:    user_uuid,
 		PartUuids:   part_uuids,
 		TotalPrice:  totalPrice,

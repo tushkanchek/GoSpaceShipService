@@ -16,10 +16,15 @@ func OrderToApi(order *model.Order) *orderV1.Order {
 		pm := PaymentMethodModelToApi(*order.PaymentMethod)
 		paymentMethod = orderV1.NewOptPaymentMethod(pm)
 	}
+	apiPartUuids := make([]string, 0, len(order.PartUuids))
+	for _, elem := range order.PartUuids{
+		apiPartUuids = append(apiPartUuids, elem.String())
+	}
+
 	return &orderV1.Order{
-		OrderUUID:       order.OrderUUID,
-		UserUUID:        order.OrderUUID,
-		PartUuids:       order.PartUuids,
+		OrderUUID:       order.OrderUUID.String(),
+		UserUUID:        order.OrderUUID.String(),
+		PartUuids:       apiPartUuids,
 		TotalPrice:      float32(order.TotalPrice),
 		TransactionUUID: transactionUUID,
 		PaymentMethod:   paymentMethod,

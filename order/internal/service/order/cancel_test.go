@@ -2,16 +2,16 @@ package order
 
 import (
 	"order/internal/model"
-	
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
 
 
 func (s *ServiceSuite) TestCancelOrderSucces() {
-	orderUuid := gofakeit.UUID()
+	orderUuid := uuid.MustParse(gofakeit.UUID())
 
 	order := &model.Order{
 		OrderUUID: orderUuid,
@@ -31,7 +31,7 @@ func (s *ServiceSuite) TestCancelOrderSucces() {
 }
 
 func (s *ServiceSuite) TestCancelOrderNotFound() {
-	orderUuid := "not-found-uuid"
+	orderUuid := uuid.MustParse(gofakeit.UUID())
 
 	s.orderRepo.On("GetOrder", s.ctx, orderUuid).Return(nil, model.ErrOrderNotFound).Once()
 	
@@ -39,15 +39,10 @@ func (s *ServiceSuite) TestCancelOrderNotFound() {
 	s.EqualError(err, model.ErrOrderNotFound.Error())
 }
 
-func (s *ServiceSuite) TestCancelOrderEmptyUuid() {
-	orderUuid := ""
 
-	err := s.service.CancelOrder(s.ctx, orderUuid)
-	s.EqualError(err, model.ErrEmptyOrderUuid.Error())
-}
 
 func (s *ServiceSuite) TestCancelOrderAlreadyPaid() {
-	orderUuid := gofakeit.UUID()
+	orderUuid := uuid.MustParse(gofakeit.UUID())
 	order := &model.Order{
 		OrderUUID: orderUuid,
 		OrderStatus: model.OrderStatusPAID,

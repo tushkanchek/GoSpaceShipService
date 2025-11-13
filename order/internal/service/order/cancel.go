@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"order/internal/model"
+
+	"github.com/google/uuid"
 )
 
-func (s *service) CancelOrder(ctx context.Context, order_uuid string) error {
-	if order_uuid == "" {
+func (s *service) CancelOrder(ctx context.Context, order_uuid uuid.UUID) error {
+	if order_uuid == uuid.Nil {
 		return model.ErrEmptyOrderUuid
 	}
 

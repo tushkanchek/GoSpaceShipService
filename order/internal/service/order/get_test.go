@@ -4,11 +4,12 @@ import (
 	"order/internal/model"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 )
 
 
 func (s *ServiceSuite) TestGetOrderSucces() {
-	order_uuid := gofakeit.UUID()
+	order_uuid := uuid.MustParse(gofakeit.UUID())
 
 	order := &model.Order{
 		OrderUUID: order_uuid,
@@ -24,7 +25,7 @@ func (s *ServiceSuite) TestGetOrderSucces() {
 
 
 func (s *ServiceSuite) TestGetOrderEmptyOrderUuid() {
-	order_uuid := ""
+	order_uuid := uuid.Nil
 
 	result, err := s.service.GetOrderByUUID(s.ctx, order_uuid)
 
@@ -34,7 +35,7 @@ func (s *ServiceSuite) TestGetOrderEmptyOrderUuid() {
 
 
 func (s *ServiceSuite) TestGetOrderNotFound() {
-	order_uuid := "unexist-uuid"
+	order_uuid := uuid.MustParse(gofakeit.UUID())
 
 	s.orderRepo.On("GetOrder", s.ctx, order_uuid).Return(nil, model.ErrOrderNotFound)
 

@@ -5,11 +5,12 @@ import (
 	"order/internal/model"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
 func (s *ServiceSuite) TestCreateOrderSucces() {
-	user_uuid := gofakeit.UUID()
+	user_uuid := uuid.MustParse(gofakeit.UUID())
 
 	uuid1 := gofakeit.UUID()
 	uuid2 := gofakeit.UUID()
@@ -34,9 +35,9 @@ func (s *ServiceSuite) TestCreateOrderSucces() {
 	}
 
 	order := &model.Order{
-		OrderUUID:   gofakeit.UUID(),
+		OrderUUID:   uuid.MustParse(gofakeit.UUID()),
 		UserUUID:    user_uuid,
-		PartUuids:   part_uuids,
+		PartUuids:   []uuid.UUID{uuid.MustParse(uuid1), uuid.MustParse(uuid2)},
 		TotalPrice:  price1 + price2,
 		OrderStatus: model.OrderStatusPENDINGPAYMENT,
 	}
@@ -50,7 +51,7 @@ func (s *ServiceSuite) TestCreateOrderSucces() {
 			o.OrderStatus == model.OrderStatusPENDINGPAYMENT
 	})).Return(nil).Once()
 
-	result, err := s.service.CreateOrder(s.ctx, user_uuid, part_uuids)
+	result, err := s.service.CreateOrder(s.ctx, user_uuid, []uuid.UUID{uuid.MustParse(uuid1), uuid.MustParse(uuid2)})
 
 	s.Nil(err)
 	//s.Equal(order.OrderUUID, result.OrderUUID)
@@ -64,7 +65,7 @@ func (s *ServiceSuite) TestCreateOrderSucces() {
 
 
 func (s *ServiceSuite) TestCreateOrderAlreadyExists() {
-	user_uuid := gofakeit.UUID()
+	user_uuid := uuid.MustParse(gofakeit.UUID())
 
 	uuid1 := gofakeit.UUID()
 	uuid2 := gofakeit.UUID()
@@ -97,7 +98,7 @@ func (s *ServiceSuite) TestCreateOrderAlreadyExists() {
 			o.OrderStatus == model.OrderStatusPENDINGPAYMENT
 	})).Return(model.ErrOrderAlreadyExists).Once()
 
-	result, err := s.service.CreateOrder(s.ctx, user_uuid, part_uuids)
+	result, err := s.service.CreateOrder(s.ctx, user_uuid, []uuid.UUID{uuid.MustParse(uuid1), uuid.MustParse(uuid2)})
 
 	s.Nil(result)
 	s.EqualError(err, model.ErrOrderAlreadyExists.Error())
