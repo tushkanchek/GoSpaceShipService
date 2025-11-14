@@ -23,7 +23,7 @@ jobs:
 
   lint:
     needs: extract-vars
-    uses: ./.github/workflows/lint-reusable.yml@main
+    uses: ./.github/workflows/lint-reusable.yml
     with:
       modules: ${{ needs.extract-vars.outputs.modules }}
       go-version: ${{ needs.extract-vars.outputs.go-version }}
@@ -31,7 +31,7 @@ jobs:
 
   test:
     needs: lint
-    uses: ./.github/workflows/test-reusable.yml@main
+    uses: ./.github/workflows/test-reusable.yml
     with:
       modules: ${{ needs.extract-vars.outputs.modules }}
       go-version: ${{ needs.extract-vars.outputs.go-version }}
@@ -39,7 +39,7 @@ jobs:
   coverage:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: test
-    uses: ./.github/workflows/test-coverage-reusable.yml@main
+    uses: ./.github/workflows/test-coverage-reusable.yml
     with:
       modules: ${{ needs.extract-vars.outputs.modules }}
       go-version: ${{ needs.extract-vars.outputs.go-version }}
