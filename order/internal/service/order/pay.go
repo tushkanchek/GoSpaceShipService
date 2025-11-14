@@ -34,7 +34,7 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, PaymentMet
 	}
 
 	order.OrderStatus = model.OrderStatusPAID
-	order.TransactionUUID = lo.ToPtr(transaction_uuid.String())
+	order.TransactionUUID = lo.ToPtr(transaction_uuid)
 	order.PaymentMethod = &PaymentMethod
 
 	err = s.OrderRepository.UpdateOrder(ctx, order)

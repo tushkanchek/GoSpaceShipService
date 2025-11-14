@@ -50,13 +50,7 @@ func RepoManufacturerToManufacturer(manafacturer repoModel.Manufacturer) *model.
 
 func PartsFilterToRepoPartsFilter(filter *model.PartsFilter) *repoModel.PartsFilter {
 	if filter == nil {
-        return &repoModel.PartsFilter{
-            Uuids:                 []string{},
-            Names:                 []string{},
-            Categories:            []repoModel.Category{},
-            ManufacturerCountries: []string{},
-            Tags:                  []string{},
-        }
+        return nil
     }
 	
 	categories := make([]repoModel.Category, 0, len(filter.Categories))

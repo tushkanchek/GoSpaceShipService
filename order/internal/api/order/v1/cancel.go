@@ -7,18 +7,11 @@ import (
 	"order/internal/model"
 	orderV1 "shared/pkg/openapi/order/v1"
 
-	"github.com/google/uuid"
+	
 )
 
 func (a *api) CancelOrder(ctx context.Context, params orderV1.CancelOrderParams) (orderV1.CancelOrderRes, error) {
-	order_uuid, err := uuid.Parse(params.OrderUUID)
-	if err!=nil{
-		return &orderV1.BadRequestError{
-				Code:    http.StatusBadRequest,
-				Message: "order uuid couldnt be parsed",
-			}, nil
-	}
-	err = a.service.CancelOrder(ctx, order_uuid)
+	err := a.service.CancelOrder(ctx, params.OrderUUID)
 	if err != nil {
 		switch err {
 		case model.ErrOrderNotFound:

@@ -23,7 +23,7 @@ func (s *ServiceSuite) TestPayOrderSucces() {
 		OrderStatus: model.OrderStatusPENDINGPAYMENT,
 	}
 	
-	transaction_uuid := gofakeit.UUID()
+	transaction_uuid := uuid.MustParse(gofakeit.UUID())
 
 	orderPaid := &model.Order{
 		OrderUUID: orderUuid,
@@ -34,13 +34,13 @@ func (s *ServiceSuite) TestPayOrderSucces() {
 	}
 
 	s.orderRepo.On("GetOrder", s.ctx, orderUuid).Return(order, nil).Once()
-	s.paymentClient.On("PayOrder", s.ctx, orderUuid.String(), userUuid.String(), paymentMethod).Return(uuid.MustParse(transaction_uuid), nil).Once()
+	s.paymentClient.On("PayOrder", s.ctx, orderUuid.String(), userUuid.String(), paymentMethod).Return(transaction_uuid, nil).Once()
 	s.orderRepo.On("UpdateOrder", s.ctx, orderPaid).Return(nil)
 
 	result, err := s.service.PayOrder(s.ctx, orderUuid, paymentMethod)
 
 	s.NoError(err)
-	s.Equal(transaction_uuid, result.String())
+	s.Equal(transaction_uuid, result)
 }
 
 

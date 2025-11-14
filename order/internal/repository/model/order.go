@@ -89,71 +89,12 @@ func (o OrderStatus) Value() (driver.Value, error){
 }
 
 
-
-
-
-// Scan реализует sql.Scanner (для чтения)
-// func (u *UUIDArray) Scan(src any) error {
-//     if src == nil {
-//         *u = []uuid.UUID{}
-//         return nil
-//     }
-
-//     var s string
-//     switch v := src.(type) {
-//     case string:
-//         s = v
-//     case []byte:
-//         s = string(v)
-//     default:
-//         return fmt.Errorf("UUIDArray: expected string or []byte, got %T", src)
-//     }
-
-//     s = strings.Trim(s, "{}")
-//     if s == "" {
-//         *u = []uuid.UUID{}
-//         return nil
-//     }
-
-//     parts := strings.Split(s, ",")
-//     *u = make([]uuid.UUID, 0, len(parts))
-
-//     for _, p := range parts {
-//         p = strings.TrimSpace(p)
-//         p = strings.Trim(p, `"`)  // <-- важно, чтобы убрать кавычки
-//         if p == "" {
-//             continue
-//         }
-//         id, err := uuid.Parse(p)
-//         if err != nil {
-//             return fmt.Errorf("UUIDArray: parse error for '%s': %w", p, err)
-//         }
-//         *u = append(*u, id)
-//     }
-
-//     return nil
-// }
-
-
-// Value реализует driver.Valuer (для записи)
-// func (u UUIDArray) Value() (driver.Value, error) {
-//     if len(u) == 0 {
-//         return "{}", nil
-//     }
-//     strs := make([]string, len(u))
-//     for i, id := range u {
-//         strs[i] = id.String()
-//     }
-//     return "{" + strings.Join(strs, ",") + "}", nil
-// }
-
-
 type Order struct {
 	OrderUUID       uuid.UUID
 	UserUUID        uuid.UUID
 	PartUuids       []uuid.UUID
 	TotalPrice      float64
-	TransactionUUID *string
+	TransactionUUID *uuid.UUID
 	PaymentMethod   *PaymentMethod
 	OrderStatus     OrderStatus
 }

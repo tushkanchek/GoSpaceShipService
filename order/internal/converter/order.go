@@ -6,9 +6,9 @@ import (
 )
 
 func OrderToApi(order *model.Order) *orderV1.Order {
-	var transactionUUID orderV1.OptString
+	var transactionUUID orderV1.OptUUID
 	if order.TransactionUUID != nil {
-		transactionUUID = orderV1.NewOptString(*order.TransactionUUID)
+		transactionUUID = orderV1.NewOptUUID(*order.TransactionUUID)
 	}
 
 	var paymentMethod orderV1.OptPaymentMethod
@@ -16,15 +16,11 @@ func OrderToApi(order *model.Order) *orderV1.Order {
 		pm := PaymentMethodModelToApi(*order.PaymentMethod)
 		paymentMethod = orderV1.NewOptPaymentMethod(pm)
 	}
-	apiPartUuids := make([]string, 0, len(order.PartUuids))
-	for _, elem := range order.PartUuids{
-		apiPartUuids = append(apiPartUuids, elem.String())
-	}
 
 	return &orderV1.Order{
-		OrderUUID:       order.OrderUUID.String(),
-		UserUUID:        order.OrderUUID.String(),
-		PartUuids:       apiPartUuids,
+		OrderUUID:       order.OrderUUID,
+		UserUUID:        order.OrderUUID,
+		PartUuids:       order.PartUuids,
 		TotalPrice:      float32(order.TotalPrice),
 		TransactionUUID: transactionUUID,
 		PaymentMethod:   paymentMethod,
