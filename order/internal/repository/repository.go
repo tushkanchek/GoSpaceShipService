@@ -3,9 +3,8 @@ package repository
 import (
 	"context"
 
-	model "order/internal/model"
-
 	"github.com/google/uuid"
+	model "order/internal/model"
 )
 
 type OrderRepository interface {

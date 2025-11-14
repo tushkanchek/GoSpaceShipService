@@ -50,9 +50,9 @@ func RepoManufacturerToManufacturer(manafacturer repoModel.Manufacturer) *model.
 
 func PartsFilterToRepoPartsFilter(filter *model.PartsFilter) *repoModel.PartsFilter {
 	if filter == nil {
-        return nil
-    }
-	
+		return nil
+	}
+
 	categories := make([]repoModel.Category, 0, len(filter.Categories))
 
 	for _, category := range filter.Categories {

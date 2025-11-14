@@ -3,10 +3,9 @@ package v1
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"order/internal/model"
 	paymentV1 "shared/pkg/proto/payment/v1"
-
-	"github.com/google/uuid"
 )
 
 func (c *client) PayOrder(ctx context.Context, orderUuid, userUuid string, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
@@ -22,7 +21,7 @@ func (c *client) PayOrder(ctx context.Context, orderUuid, userUuid string, payme
 	}
 
 	transaction_uuid, err := uuid.Parse(resp.TransactionUuid)
-	if err!=nil{
+	if err != nil {
 		return uuid.Nil, err
 	}
 	return transaction_uuid, nil

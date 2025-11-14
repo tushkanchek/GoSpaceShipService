@@ -3,9 +3,8 @@ package grpc
 import (
 	"context"
 
-	"order/internal/model"
-
 	"github.com/google/uuid"
+	"order/internal/model"
 )
 
 type PaymentClient interface {

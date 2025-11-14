@@ -3,9 +3,8 @@ package part
 import (
 	"context"
 
-	"inventory/internal/model"
-
 	"github.com/google/uuid"
+	"inventory/internal/model"
 )
 
 func (s *service) GetPart(ctx context.Context, partUuid string) (*model.Part, error) {

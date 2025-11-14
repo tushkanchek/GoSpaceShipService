@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	
 )
 
 type PaymentMethod int32
@@ -18,8 +17,8 @@ const (
 	PaymentMethodInvestorMoney PaymentMethod = 4
 )
 
-func (p *PaymentMethod) Scan(src any) error{
-	switch v := src.(type){
+func (p *PaymentMethod) Scan(src any) error {
+	switch v := src.(type) {
 	case string:
 		switch v {
 		case "CARD":
@@ -33,15 +32,15 @@ func (p *PaymentMethod) Scan(src any) error{
 		default:
 			*p = PaymentMethodUNKNOWN
 		}
-	default:	
+	default:
 		return fmt.Errorf("unsupported type for PaymentMethod: %T", v)
 	}
 
-	return nil	
+	return nil
 }
 
-func (p PaymentMethod) Value() (driver.Value, error){
-	switch p{
+func (p PaymentMethod) Value() (driver.Value, error) {
+	switch p {
 	case PaymentMethodSBP:
 		return "SBP", nil
 	case PaymentMethodInvestorMoney:
@@ -53,7 +52,6 @@ func (p PaymentMethod) Value() (driver.Value, error){
 	default:
 		return "UNKNOWN", nil
 	}
-
 }
 
 type OrderStatus string
@@ -65,10 +63,10 @@ const (
 	OrderStatusCANCELLED      OrderStatus = "CANCELLED"
 )
 
-func (o *OrderStatus) Scan(src any) error{
-	switch v := src.(type){
+func (o *OrderStatus) Scan(src any) error {
+	switch v := src.(type) {
 	case string:
-		switch v{
+		switch v {
 		case "PENDING_PAYMENT":
 			*o = OrderStatusPENDINGPAYMENT
 		case "PAID":
@@ -78,16 +76,15 @@ func (o *OrderStatus) Scan(src any) error{
 		default:
 			*o = OrderStatusUNKNOWN
 		}
-	default:	
+	default:
 		return fmt.Errorf("unsupported type for PaymentMethod: %T", v)
 	}
-	return nil	
+	return nil
 }
 
-func (o OrderStatus) Value() (driver.Value, error){
+func (o OrderStatus) Value() (driver.Value, error) {
 	return string(o), nil
 }
-
 
 type Order struct {
 	OrderUUID       uuid.UUID
@@ -98,5 +95,3 @@ type Order struct {
 	PaymentMethod   *PaymentMethod
 	OrderStatus     OrderStatus
 }
-
-

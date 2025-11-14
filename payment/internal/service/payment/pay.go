@@ -8,7 +8,7 @@ import (
 	"payment/internal/model"
 )
 
-func (s *service) PayOrder(_ context.Context, orderUuid, userUuid, PaymentMethod string) (string, error) {
+func (s *service) PayOrder(_ context.Context, orderUuid, userUuid, paymentMethod string) (string, error) {
 	if orderUuid == "" {
 		return "", model.ErrEmptyOrderUuid
 	}
@@ -17,7 +17,7 @@ func (s *service) PayOrder(_ context.Context, orderUuid, userUuid, PaymentMethod
 		return "", model.ErrEmptyUserUuid
 	}
 
-	if PaymentMethod == "" {
+	if paymentMethod == "" {
 		return "", model.ErrEmptyPaymentMethod
 	}
 

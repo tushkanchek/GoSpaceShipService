@@ -1,12 +1,12 @@
 package order
 
 import (
-	"order/internal/model"
+	"context"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
+	"order/internal/model"
 )
-
 
 func (s *ServiceSuite) TestGetOrderSucces() {
 	order_uuid := uuid.MustParse(gofakeit.UUID())
@@ -15,34 +15,33 @@ func (s *ServiceSuite) TestGetOrderSucces() {
 		OrderUUID: order_uuid,
 	}
 
-	s.orderRepo.On("GetOrder", s.ctx, order_uuid).Return(order, nil)
+	ctx := context.Background()
+	s.orderRepo.On("GetOrder", ctx, order_uuid).Return(order, nil)
 
-	result, err := s.service.GetOrderByUUID(s.ctx, order_uuid)
+	result, err := s.service.GetOrderByUUID(ctx, order_uuid)
 
 	s.NoError(err)
 	s.Equal(order, result)
 }
 
-
 func (s *ServiceSuite) TestGetOrderEmptyOrderUuid() {
 	order_uuid := uuid.Nil
 
-	result, err := s.service.GetOrderByUUID(s.ctx, order_uuid)
+	ctx := context.Background()
+	result, err := s.service.GetOrderByUUID(ctx, order_uuid)
 
 	s.EqualError(err, model.ErrEmptyOrderUuid.Error())
 	s.Nil(result)
 }
 
-
 func (s *ServiceSuite) TestGetOrderNotFound() {
 	order_uuid := uuid.MustParse(gofakeit.UUID())
 
-	s.orderRepo.On("GetOrder", s.ctx, order_uuid).Return(nil, model.ErrOrderNotFound)
+	ctx := context.Background()
+	s.orderRepo.On("GetOrder", ctx, order_uuid).Return(nil, model.ErrOrderNotFound)
 
-	result, err := s.service.GetOrderByUUID(s.ctx, order_uuid)
+	result, err := s.service.GetOrderByUUID(ctx, order_uuid)
 
 	s.EqualError(err, model.ErrOrderNotFound.Error())
 	s.Nil(result)
 }
-
-

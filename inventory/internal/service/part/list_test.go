@@ -1,15 +1,14 @@
 package part
 
 import (
-	model "inventory/internal/model"
-
-	repoConverter "inventory/internal/repository/converter"
+	"context"
 
 	"github.com/brianvoe/gofakeit/v7"
+	model "inventory/internal/model"
+	repoConverter "inventory/internal/repository/converter"
 )
 
-
-//TODO: add more tests
+// TODO: add more tests
 func (s *ServiceSuite) TestListPartsSucces() {
 	uuid1 := gofakeit.UUID()
 	uuid2 := gofakeit.UUID()
@@ -33,22 +32,21 @@ func (s *ServiceSuite) TestListPartsSucces() {
 		},
 	}
 
-	s.inventoryRepo.On("ListParts", s.ctx, repoFilter).Return(expectedParts, nil)
-	
-	result, err := s.service.ListParts(s.ctx, filter)
+	ctx := context.Background()
+	s.inventoryRepo.On("ListParts", ctx, repoFilter).Return(expectedParts, nil)
+
+	result, err := s.service.ListParts(ctx, filter)
 
 	s.NoError(err)
 
 	s.Equal(expectedParts, result)
-
 }
-
 
 func (s *ServiceSuite) TestListNamesFilterSucces() {
 	uuid1 := gofakeit.UUID()
 	uuid2 := gofakeit.UUID()
 	filter := &model.PartsFilter{
-		Names:	[]string{"Jonathan Hoppe", "Albin Labadie"},
+		Names: []string{"Jonathan Hoppe", "Albin Labadie"},
 	}
 
 	repoFilter := repoConverter.PartsFilterToRepoPartsFilter(filter)
@@ -56,37 +54,34 @@ func (s *ServiceSuite) TestListNamesFilterSucces() {
 	expectedParts := []*model.Part{
 		{
 			Uuid: uuid1,
-			Name: "Jonathan Hoppe", 
+			Name: "Jonathan Hoppe",
 		},
 		{
 			Uuid: uuid2,
 			Name: "Albin Labadie",
 		},
 	}
+	ctx := context.Background()
+	s.inventoryRepo.On("ListParts", ctx, repoFilter).Return(expectedParts, nil)
 
-	s.inventoryRepo.On("ListParts", s.ctx, repoFilter).Return(expectedParts, nil)
-	
-	result, err := s.service.ListParts(s.ctx, filter)
+	result, err := s.service.ListParts(ctx, filter)
 
 	s.NoError(err)
 
 	s.Equal(expectedParts, result)
-
 }
-
 
 func (s *ServiceSuite) TestListPartsNotFound() {
 	filter := &model.PartsFilter{
-		Uuids:		[]string{"uuid-unknown"},
+		Uuids: []string{"uuid-unknown"},
 	}
 
 	repoFilter := repoConverter.PartsFilterToRepoPartsFilter(filter)
 
-	
+	ctx := context.Background()
+	s.inventoryRepo.On("ListParts", ctx, repoFilter).Return(nil, model.ErrPartsNotFound)
 
-	s.inventoryRepo.On("ListParts", s.ctx, repoFilter).Return(nil, model.ErrPartsNotFound)
-	
-	result, err := s.service.ListParts(s.ctx, filter)
+	result, err := s.service.ListParts(ctx, filter)
 
 	s.EqualError(err, model.ErrPartsNotFound.Error())
 

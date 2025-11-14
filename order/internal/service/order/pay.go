@@ -3,14 +3,13 @@ package order
 import (
 	"context"
 
-	"order/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/samber/lo"
+	"order/internal/model"
 )
 
 // TODO: check orderstatus cancel
-func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, PaymentMethod model.PaymentMethod) (uuid.UUID, error) {
+func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
 	if order_uuid == uuid.Nil {
 		return uuid.Nil, model.ErrEmptyOrderUuid
 	}
@@ -28,14 +27,14 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, PaymentMet
 		return uuid.Nil, model.ErrPayOrderStatusCancelled
 	}
 
-	transaction_uuid, err := s.PaymentClient.PayOrder(ctx, order_uuid.String(), order.UserUUID.String(), PaymentMethod)
+	transaction_uuid, err := s.PaymentClient.PayOrder(ctx, order_uuid.String(), order.UserUUID.String(), paymentMethod)
 	if err != nil {
 		return uuid.Nil, err
 	}
 
 	order.OrderStatus = model.OrderStatusPAID
 	order.TransactionUUID = lo.ToPtr(transaction_uuid)
-	order.PaymentMethod = &PaymentMethod
+	order.PaymentMethod = &paymentMethod
 
 	err = s.OrderRepository.UpdateOrder(ctx, order)
 	if err != nil {

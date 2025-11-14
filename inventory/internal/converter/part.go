@@ -11,15 +11,15 @@ import (
 // repoModel "inventory/internal/repository/model"
 
 func PartsFilterToModel(filter *inventoryV1.PartsFilter) *model.PartsFilter {
-	 if filter == nil {
-        return &model.PartsFilter{
-            Uuids:                 []string{},
-            Names:                 []string{},
-            Categories:            []model.Category{},
-            ManufacturerCountries: []string{},
-            Tags:                  []string{},
-        }
-    }
+	if filter == nil {
+		return &model.PartsFilter{
+			Uuids:                 []string{},
+			Names:                 []string{},
+			Categories:            []model.Category{},
+			ManufacturerCountries: []string{},
+			Tags:                  []string{},
+		}
+	}
 	categories := make([]model.Category, 0, len(filter.Categories))
 	for _, category := range filter.Categories {
 		categories = append(categories, CategoryToModelCategory(category))

@@ -2,8 +2,6 @@ package model
 
 import "github.com/google/uuid"
 
-
-
 type PaymentMethod int32
 
 const (
@@ -32,6 +30,3 @@ type Order struct {
 	PaymentMethod   *PaymentMethod
 	OrderStatus     OrderStatus
 }
-
-
-

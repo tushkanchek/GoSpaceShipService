@@ -16,7 +16,7 @@ func (s *service) CreateOrder(ctx context.Context, user_uuid uuid.UUID, part_uui
 	}
 
 	invPartUuids := make([]string, 0, len(part_uuids))
-	for _, elem := range part_uuids{
+	for _, elem := range part_uuids {
 		invPartUuids = append(invPartUuids, elem.String())
 	}
 	resp, err := s.InventoryClient.ListParts(ctx, &model.PartsFilter{

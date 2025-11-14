@@ -8,8 +8,6 @@ import (
 	"order/internal/converter"
 	"order/internal/model"
 	orderV1 "shared/pkg/openapi/order/v1"
-
-
 )
 
 func (a *api) GetOrderByUUID(ctx context.Context, params orderV1.GetOrderByUUIDParams) (orderV1.GetOrderByUUIDRes, error) {
