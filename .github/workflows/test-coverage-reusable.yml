@@ -43,6 +43,7 @@ jobs:
         run: task test-coverage
 
       - name: 📊 Extract coverage percent
+        id: coverage_percent
         run: |
           # Выводим последнюю строку с total и заменяем табы на пробелы
           COVERAGE_OUTPUT=$(go tool cover -func=${COVERAGE_DIR}/${COVERAGE_FILE} | tail -1)
@@ -56,16 +57,15 @@ jobs:
           TOTAL=$(echo "$CLEAN_OUTPUT" | awk '{print $NF}')
           echo "💯 Total coverage: $TOTAL"
 
-          # Сохраняем в переменные окружения
-          echo "TOTAL_COVERAGE=$TOTAL" >> $GITHUB_ENV
-          echo "GIST_ID=${{ inputs.gist-id }}" >> $GITHUB_ENV
+          # Сохраняем в выходные данные шага
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: 🏷️ Update Gist Badge
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: ${{ env.GIST_ID }}
+          gistID: ${{ inputs.gist-id }}
           filename: coverage.json
           label: Coverage
-          message: ${{ env.TOTAL_COVERAGE }}
+          message: ${{ steps.coverage_percent.outputs.total }}
           color: green
