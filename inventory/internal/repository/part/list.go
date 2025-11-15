@@ -10,10 +10,11 @@ import (
 	repoModel "inventory/internal/repository/model"
 )
 
-func (r *repository) ListParts(ctx context.Context, filter *repoModel.PartsFilter) ([]*model.Part, error) {
+func (r *repository) ListParts(ctx context.Context, filter *model.PartsFilter) ([]*model.Part, error) {
+	filterRepo := repoConverter.PartsFilterToRepoPartsFilter(filter)
 	mongoFilter := bson.M{}
 	if filter != nil {
-		mongoFilter = buildMongoFilter(filter)
+		mongoFilter = buildMongoFilter(filterRepo)
 	}
 	cursor, err := r.collection.Find(ctx, mongoFilter)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/stretchr/testify/mock"
 	"inventory/internal/model"
 )
 
@@ -15,7 +16,7 @@ func (s *ServiceSuite) TestGetPartSucces() {
 	}
 
 	ctx := context.Background()
-	s.inventoryRepo.On("GetPart", ctx, partUuidStr).Return(part, nil).Once()
+	s.inventoryRepo.On("GetPart", mock.Anything, partUuidStr).Return(part, nil).Once()
 
 	result, err := s.service.GetPart(ctx, partUuidStr)
 
@@ -47,7 +48,7 @@ func (s *ServiceSuite) TestGetPartNotFoundPart() {
 	partUuid := gofakeit.UUID()
 
 	ctx := context.Background()
-	s.inventoryRepo.On("GetPart", ctx, partUuid).Return(&model.Part{}, model.ErrPartNotFound).Once()
+	s.inventoryRepo.On("GetPart", mock.Anything, partUuid).Return(&model.Part{}, model.ErrPartNotFound).Once()
 
 	result, err := s.service.GetPart(ctx, partUuid)
 

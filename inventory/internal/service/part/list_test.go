@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/stretchr/testify/mock"
 	model "inventory/internal/model"
-	repoConverter "inventory/internal/repository/converter"
 )
 
 // TODO: add more tests
@@ -21,8 +21,6 @@ func (s *ServiceSuite) TestListPartsSucces() {
 		Tags:                  []string{"engine", "premium"},
 	}
 
-	repoFilter := repoConverter.PartsFilterToRepoPartsFilter(filter)
-
 	expectedParts := []*model.Part{
 		{
 			Uuid: uuid1,
@@ -33,7 +31,7 @@ func (s *ServiceSuite) TestListPartsSucces() {
 	}
 
 	ctx := context.Background()
-	s.inventoryRepo.On("ListParts", ctx, repoFilter).Return(expectedParts, nil)
+	s.inventoryRepo.On("ListParts", mock.Anything, filter).Return(expectedParts, nil)
 
 	result, err := s.service.ListParts(ctx, filter)
 
@@ -49,8 +47,6 @@ func (s *ServiceSuite) TestListNamesFilterSucces() {
 		Names: []string{"Jonathan Hoppe", "Albin Labadie"},
 	}
 
-	repoFilter := repoConverter.PartsFilterToRepoPartsFilter(filter)
-
 	expectedParts := []*model.Part{
 		{
 			Uuid: uuid1,
@@ -62,7 +58,7 @@ func (s *ServiceSuite) TestListNamesFilterSucces() {
 		},
 	}
 	ctx := context.Background()
-	s.inventoryRepo.On("ListParts", ctx, repoFilter).Return(expectedParts, nil)
+	s.inventoryRepo.On("ListParts", mock.Anything, filter).Return(expectedParts, nil)
 
 	result, err := s.service.ListParts(ctx, filter)
 
@@ -76,10 +72,8 @@ func (s *ServiceSuite) TestListPartsNotFound() {
 		Uuids: []string{"uuid-unknown"},
 	}
 
-	repoFilter := repoConverter.PartsFilterToRepoPartsFilter(filter)
-
 	ctx := context.Background()
-	s.inventoryRepo.On("ListParts", ctx, repoFilter).Return(nil, model.ErrPartsNotFound)
+	s.inventoryRepo.On("ListParts", mock.Anything, filter).Return(nil, model.ErrPartsNotFound)
 
 	result, err := s.service.ListParts(ctx, filter)
 

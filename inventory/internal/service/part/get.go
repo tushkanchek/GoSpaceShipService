@@ -15,7 +15,10 @@ func (s *service) GetPart(ctx context.Context, partUuid string) (*model.Part, er
 		return nil, model.ErrUUIDIsNotValid
 	}
 
-	part, err := s.inventoryRepository.GetPart(ctx, partUuid)
+	reqGetCtx, cancelGet := context.WithTimeout(ctx, model.RequestTimeOutRead)
+	defer cancelGet()
+
+	part, err := s.inventoryRepository.GetPart(reqGetCtx, partUuid)
 	if err != nil {
 		return nil, err
 	}
