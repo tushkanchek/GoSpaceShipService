@@ -25,6 +25,7 @@ vars:
   PROTOC_GEN_GO_GRPC: '{{.BIN_DIR}}/protoc-gen-go-grpc'
   MOCKERY: "{{.BIN_DIR}}/mockery"
   GRPCURL: '{{.BIN_DIR}}/grpcurl'
+  ENV_PATH: "{{.ROOT_DIR}}/.env"
 
   NODE_MODULES_DIR: '{{.ROOT_DIR}}/node_modules/.bin'
   REDOCLY: '{{.NODE_MODULES_DIR}}/redocly'
@@ -374,42 +375,42 @@ tasks:
     dir: deploy/compose/core
     cmds:
       - echo "[task] 🚀 Поднимаем core контейнеры"
-      - docker compose up --build --detach
+      - docker compose --env-file {{.ENV_PATH}} up --build --detach
 
   down-core:
     desc: Остановить и удалить core контейнеры
     dir: deploy/compose/core
     cmds:
       - echo "[task] 🛑 Останавливаем core контейнеры"
-      - docker compose down --volumes
+      - docker compose --env-file {{.ENV_PATH}} down --volumes
 
   up-inventory:
     desc: Поднять Inventory сервис и все его зависимости
     dir: deploy/compose/inventory
     cmds:
       - echo "[task] 📦 Поднимаем Inventory с зависимостями"
-      - docker compose up --build --detach
+      - docker compose --env-file {{.ENV_PATH}} up --build --detach
 
   down-inventory:
     desc: Остановить и удалить Inventory сервис и все его зависимости
     dir: deploy/compose/inventory
     cmds:
       - echo "[task] 🛑 Останавливаем Inventory с зависимостями"
-      - docker compose down --volumes
+      - docker compose --env-file {{.ENV_PATH}} down --volumes
 
   up-order:
     desc: Поднять Order сервис и все его зависимости
     dir: deploy/compose/order
     cmds:
       - echo "[task] 📦 Поднимаем Order с зависимостями"
-      - docker compose up --build --detach
+      - docker compose --env-file {{.ENV_PATH}} up --build --detach
 
   down-order:
     desc: Остановить и удалить Order сервис и все его зависимости
     dir: deploy/compose/order
     cmds:
       - echo "[task] 🛑 Останавливаем Order с зависимостями"
-      - docker compose down --volumes
+      - docker compose --env-file {{.ENV_PATH}} down --volumes
 
   up-all:
     desc: Поднять все сервисы по очереди вместе с зависимостями

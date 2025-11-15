@@ -36,18 +36,22 @@ const (
 	shutdownTimeout   = 10 * time.Second
 	inventoryAdress   = "50051"
 	paymentAdress     = "50052"
+
+	envPathDefault = ".env"
+	DB_URI = "DB_URI"
+	MIGRATIONS_DIR = "MIGRATIONS_DIR"
 )
 
 func main() {
 	ctx := context.Background()
 
-	err := godotenv.Load("./deploy/compose/order/.env")
+	err := godotenv.Load(envPathDefault)
 	if err != nil {
 		log.Printf("failed to load .env file: %v\n", err)
 		return
 	}
 
-	dbURI := os.Getenv("DB_URI")
+	dbURI := os.Getenv(DB_URI)
 
 	con, err := pgx.Connect(ctx, dbURI)
 	if err != nil {
@@ -67,7 +71,7 @@ func main() {
 		return
 	}
 
-	migrationDir := os.Getenv("MIGRATIONS_DIR")
+	migrationDir := os.Getenv(MIGRATIONS_DIR)
 	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*con.Config().Copy()), migrationDir)
 
 	err = migratorRunner.Up()
@@ -120,7 +124,6 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(10 * time.Second))
 	r.Use(render.SetContentType(render.ContentTypeJSON))
-
 	r.Mount("/", orderServer)
 
 	server := &http.Server{

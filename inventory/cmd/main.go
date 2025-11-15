@@ -36,7 +36,7 @@ func main() {
 
 	ctx := context.Background()
 
-	err = godotenv.Load("deploy/compose/inventory/.env")
+	err = godotenv.Load(".env")
 	if err != nil {
 		log.Printf("failed to load environment")
 		return
