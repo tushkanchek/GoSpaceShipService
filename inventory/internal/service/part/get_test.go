@@ -1,10 +1,11 @@
 package part
 
 import (
-	"inventory/internal/model"
+	"context"
 
 	"github.com/brianvoe/gofakeit/v7"
-	
+	"github.com/stretchr/testify/mock"
+	"inventory/internal/model"
 )
 
 func (s *ServiceSuite) TestGetPartSucces() {
@@ -14,9 +15,10 @@ func (s *ServiceSuite) TestGetPartSucces() {
 		Uuid: partUuidStr,
 	}
 
-	s.inventoryRepo.On("GetPart", s.ctx, partUuidStr).Return(part, nil).Once()
+	ctx := context.Background()
+	s.inventoryRepo.On("GetPart", mock.Anything, partUuidStr).Return(part, nil).Once()
 
-	result, err := s.service.GetPart(s.ctx, partUuidStr)
+	result, err := s.service.GetPart(ctx, partUuidStr)
 
 	s.NoError(err)
 	s.Equal(part, result)
@@ -25,7 +27,8 @@ func (s *ServiceSuite) TestGetPartSucces() {
 func (s *ServiceSuite) TestGetPartEmptyUuid() {
 	emptyUuid := ""
 
-	result, err := s.service.GetPart(s.ctx, emptyUuid)
+	ctx := context.Background()
+	result, err := s.service.GetPart(ctx, emptyUuid)
 
 	s.EqualError(err, model.ErrPartUUIDIsEmpty.Error())
 	s.Nil(result)
@@ -34,26 +37,22 @@ func (s *ServiceSuite) TestGetPartEmptyUuid() {
 func (s *ServiceSuite) TestGetPartInvalidUuid() {
 	invalidUuid := "apelsin-serega"
 
-	result, err := s.service.GetPart(s.ctx, invalidUuid)
+	ctx := context.Background()
+	result, err := s.service.GetPart(ctx, invalidUuid)
 
 	s.EqualError(err, model.ErrUUIDIsNotValid.Error())
 	s.Nil(result)
 }
 
-func (s *ServiceSuite) TestGetPartNotFoundPart(){
+func (s *ServiceSuite) TestGetPartNotFoundPart() {
 	partUuid := gofakeit.UUID()
 
-	s.inventoryRepo.On("GetPart", s.ctx, partUuid).Return(&model.Part{}, model.ErrPartNotFound).Once()
+	ctx := context.Background()
+	s.inventoryRepo.On("GetPart", mock.Anything, partUuid).Return(&model.Part{}, model.ErrPartNotFound).Once()
 
-	result, err := s.service.GetPart(s.ctx, partUuid)
+	result, err := s.service.GetPart(ctx, partUuid)
 
 	s.EqualError(err, model.ErrPartNotFound.Error())
 
 	s.Nil(result)
-	
 }
-
-
-
-
-

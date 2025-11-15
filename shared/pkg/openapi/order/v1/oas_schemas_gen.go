@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-faster/errors"
+	"github.com/google/uuid"
 )
 
 func (s *GenericErrorStatusCode) Error() string {
@@ -83,41 +84,41 @@ func (*ConflictError) cancelOrderRes() {}
 // Ref: #/components/schemas/create_order_request
 type CreateOrderRequest struct {
 	// Uuid нашего пользователя.
-	UserUUID string `json:"user_uuid"`
+	UserUUID uuid.UUID `json:"user_uuid"`
 	// Список uuid наших деталей.
-	PartUuids []string `json:"part_uuids"`
+	PartUuids []uuid.UUID `json:"part_uuids"`
 }
 
 // GetUserUUID returns the value of UserUUID.
-func (s *CreateOrderRequest) GetUserUUID() string {
+func (s *CreateOrderRequest) GetUserUUID() uuid.UUID {
 	return s.UserUUID
 }
 
 // GetPartUuids returns the value of PartUuids.
-func (s *CreateOrderRequest) GetPartUuids() []string {
+func (s *CreateOrderRequest) GetPartUuids() []uuid.UUID {
 	return s.PartUuids
 }
 
 // SetUserUUID sets the value of UserUUID.
-func (s *CreateOrderRequest) SetUserUUID(val string) {
+func (s *CreateOrderRequest) SetUserUUID(val uuid.UUID) {
 	s.UserUUID = val
 }
 
 // SetPartUuids sets the value of PartUuids.
-func (s *CreateOrderRequest) SetPartUuids(val []string) {
+func (s *CreateOrderRequest) SetPartUuids(val []uuid.UUID) {
 	s.PartUuids = val
 }
 
 // Ref: #/components/schemas/create_order_response
 type CreateOrderResponse struct {
 	// Uuid созданного заказа.
-	OrderUUID string `json:"order_uuid"`
+	OrderUUID uuid.UUID `json:"order_uuid"`
 	// Итоговая сумма заказа.
 	TotalPrice float32 `json:"total_price"`
 }
 
 // GetOrderUUID returns the value of OrderUUID.
-func (s *CreateOrderResponse) GetOrderUUID() string {
+func (s *CreateOrderResponse) GetOrderUUID() uuid.UUID {
 	return s.OrderUUID
 }
 
@@ -127,7 +128,7 @@ func (s *CreateOrderResponse) GetTotalPrice() float32 {
 }
 
 // SetOrderUUID sets the value of OrderUUID.
-func (s *CreateOrderResponse) SetOrderUUID(val string) {
+func (s *CreateOrderResponse) SetOrderUUID(val uuid.UUID) {
 	s.OrderUUID = val
 }
 
@@ -413,34 +414,80 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// NewOptUUID returns new OptUUID with value set to v.
+func NewOptUUID(v uuid.UUID) OptUUID {
+	return OptUUID{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptUUID is optional uuid.UUID.
+type OptUUID struct {
+	Value uuid.UUID
+	Set   bool
+}
+
+// IsSet returns true if OptUUID was set.
+func (o OptUUID) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptUUID) Reset() {
+	var v uuid.UUID
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptUUID) SetTo(v uuid.UUID) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptUUID) Get() (v uuid.UUID, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptUUID) Or(d uuid.UUID) uuid.UUID {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // Ref: #/components/schemas/order
 type Order struct {
 	// Uuid созданного заказа.
-	OrderUUID string `json:"order_uuid"`
+	OrderUUID uuid.UUID `json:"order_uuid"`
 	// Uuid пользователя оформляющего заказ.
-	UserUUID string `json:"user_uuid"`
+	UserUUID uuid.UUID `json:"user_uuid"`
 	// Список uuid наших деталей.
-	PartUuids []string `json:"part_uuids"`
+	PartUuids []uuid.UUID `json:"part_uuids"`
 	// Итоговая сумма заказа.
 	TotalPrice float32 `json:"total_price"`
 	// Uuid транзакции платежа.
-	TransactionUUID OptString        `json:"transaction_uuid"`
+	TransactionUUID OptUUID          `json:"transaction_uuid"`
 	PaymentMethod   OptPaymentMethod `json:"payment_method"`
 	Status          OrderStatus      `json:"status"`
 }
 
 // GetOrderUUID returns the value of OrderUUID.
-func (s *Order) GetOrderUUID() string {
+func (s *Order) GetOrderUUID() uuid.UUID {
 	return s.OrderUUID
 }
 
 // GetUserUUID returns the value of UserUUID.
-func (s *Order) GetUserUUID() string {
+func (s *Order) GetUserUUID() uuid.UUID {
 	return s.UserUUID
 }
 
 // GetPartUuids returns the value of PartUuids.
-func (s *Order) GetPartUuids() []string {
+func (s *Order) GetPartUuids() []uuid.UUID {
 	return s.PartUuids
 }
 
@@ -450,7 +497,7 @@ func (s *Order) GetTotalPrice() float32 {
 }
 
 // GetTransactionUUID returns the value of TransactionUUID.
-func (s *Order) GetTransactionUUID() OptString {
+func (s *Order) GetTransactionUUID() OptUUID {
 	return s.TransactionUUID
 }
 
@@ -465,17 +512,17 @@ func (s *Order) GetStatus() OrderStatus {
 }
 
 // SetOrderUUID sets the value of OrderUUID.
-func (s *Order) SetOrderUUID(val string) {
+func (s *Order) SetOrderUUID(val uuid.UUID) {
 	s.OrderUUID = val
 }
 
 // SetUserUUID sets the value of UserUUID.
-func (s *Order) SetUserUUID(val string) {
+func (s *Order) SetUserUUID(val uuid.UUID) {
 	s.UserUUID = val
 }
 
 // SetPartUuids sets the value of PartUuids.
-func (s *Order) SetPartUuids(val []string) {
+func (s *Order) SetPartUuids(val []uuid.UUID) {
 	s.PartUuids = val
 }
 
@@ -485,7 +532,7 @@ func (s *Order) SetTotalPrice(val float32) {
 }
 
 // SetTransactionUUID sets the value of TransactionUUID.
-func (s *Order) SetTransactionUUID(val OptString) {
+func (s *Order) SetTransactionUUID(val OptUUID) {
 	s.TransactionUUID = val
 }
 
@@ -574,16 +621,16 @@ func (s *PayOrderRequest) SetPaymentMethod(val PaymentMethod) {
 // Ref: #/components/schemas/pay_order_response
 type PayOrderResponse struct {
 	// Uuid транзакции.
-	TransactionUUID string `json:"transaction_uuid"`
+	TransactionUUID uuid.UUID `json:"transaction_uuid"`
 }
 
 // GetTransactionUUID returns the value of TransactionUUID.
-func (s *PayOrderResponse) GetTransactionUUID() string {
+func (s *PayOrderResponse) GetTransactionUUID() uuid.UUID {
 	return s.TransactionUUID
 }
 
 // SetTransactionUUID sets the value of TransactionUUID.
-func (s *PayOrderResponse) SetTransactionUUID(val string) {
+func (s *PayOrderResponse) SetTransactionUUID(val uuid.UUID) {
 	s.TransactionUUID = val
 }
 

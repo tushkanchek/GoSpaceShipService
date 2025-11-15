@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Category int32
 
@@ -13,37 +15,37 @@ const (
 )
 
 type Dimensions struct {
-	Length float64
-	Width  float64
-	Height float64
-	Weight float64
+	Length float64 `bson:"length"`
+	Width  float64 `bson:"width, omitempty"`
+	Height float64 `bson:"height, omitempty"`
+	Weight float64 `bson:"weight, omitempty"`
 }
 
 type Manufacturer struct {
-	Name    string
-	Country string
-	Website string
+	Name    string `bson:"name, omitempty"`
+	Country string `bson:"country, omitempty"`
+	Website string `bson:"website, omitempty"`
 }
 
 type Part struct {
-	Uuid          string
-	Name          string
-	Description   string
-	Price         float64
-	StockQuantity int64
-	Category      Category
-	Dimensions    *Dimensions
-	Manufacturer  *Manufacturer
-	Tags          []string
-	Metadata      map[string]any
-	CreatedAt     *time.Time
-	UpdatedAt     *time.Time
+	Uuid          string         `bson:"uuid"`
+	Name          string         `bson:"name"`
+	Description   string         `bson:"description"`
+	Price         float64        `bson:"price"`
+	StockQuantity int64          `bson:"stockquantity"`
+	Category      Category       `bson:"category"`
+	Dimensions    *Dimensions    `bson:"dimensions,omitempty"`
+	Manufacturer  *Manufacturer  `bson:"manufacturer,omitempty"`
+	Tags          []string       `bson:"tags,omitempty"`
+	Metadata      map[string]any `bson:"metadata,omitempty"`
+	CreatedAt     *time.Time     `bson:"created_at"`
+	UpdatedAt     *time.Time     `bson:"updated_at,omitempty"`
 }
 
 type PartsFilter struct {
-	Uuids                 []string
-	Names                 []string
-	Categories            []Category
-	ManufacturerCountries []string
-	Tags                  []string
+	Uuids                 []string   `bson:"uuids,omitempty"`
+	Names                 []string   `bson:"names,omitempty"`
+	Categories            []Category `bson:"categories,omitempty"`
+	ManufacturerCountries []string   `bson:"manafacturer_countries,omitempty"`
+	Tags                  []string   `bson:"tags, omitempty"`
 }

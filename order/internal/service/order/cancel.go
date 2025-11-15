@@ -3,15 +3,19 @@ package order
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"order/internal/model"
 )
 
-func (s *service) CancelOrder(ctx context.Context, order_uuid string) error {
-	if order_uuid == "" {
+func (s *service) CancelOrder(ctx context.Context, order_uuid uuid.UUID) error {
+	if order_uuid == uuid.Nil {
 		return model.ErrEmptyOrderUuid
 	}
 
-	order, err := s.OrderRepository.GetOrder(ctx, order_uuid)
+	reqGetCtx, cancelGet := context.WithTimeout(ctx, model.RequestTimeOutRead)
+	defer cancelGet()
+
+	order, err := s.OrderRepository.GetOrder(reqGetCtx, order_uuid)
 	if err != nil {
 		return err
 	}
@@ -21,5 +25,9 @@ func (s *service) CancelOrder(ctx context.Context, order_uuid string) error {
 	}
 
 	order.OrderStatus = model.OrderStatusCANCELLED
-	return s.OrderRepository.UpdateOrder(ctx, order)
+
+	reqUpdateCtx, cancelUpdate := context.WithTimeout(ctx, model.RequestTimeOutUpdate)
+	defer cancelUpdate()
+
+	return s.OrderRepository.UpdateOrder(reqUpdateCtx, order)
 }

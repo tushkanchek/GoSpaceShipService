@@ -3,40 +3,52 @@ package order
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"github.com/samber/lo"
 	"order/internal/model"
 )
 
 // TODO: check orderstatus cancel
-func (s *service) PayOrder(ctx context.Context, order_uuid string, PaymentMethod model.PaymentMethod) (string, error) {
-	if order_uuid == "" {
-		return "", model.ErrEmptyOrderUuid
-	}
-	order, err := s.OrderRepository.GetOrder(ctx, order_uuid)
-	if err != nil {
-		return "", err
-	}
-	if order == nil {
-		return "", model.ErrOrderNotFound
-	}
-	if order.OrderStatus == model.OrderStatusPAID {
-		return "", model.ErrPayOrderStatusPaid
-	}
-	if order.OrderStatus == model.OrderStatusCANCELLED {
-		return "", model.ErrPayOrderStatusCancelled
+func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
+	if order_uuid == uuid.Nil {
+		return uuid.Nil, model.ErrEmptyOrderUuid
 	}
 
-	transaction_uuid, err := s.PaymentClient.PayOrder(ctx, order_uuid, order.UserUUID, PaymentMethod)
+	reqGetCtx, cancelGet := context.WithTimeout(ctx, model.RequestTimeOutRead)
+	defer cancelGet()
+
+	order, err := s.OrderRepository.GetOrder(reqGetCtx, order_uuid)
 	if err != nil {
-		return "", err
+		return uuid.Nil, err
+	}
+	if order == nil {
+		return uuid.Nil, model.ErrOrderNotFound
+	}
+	if order.OrderStatus == model.OrderStatusPAID {
+		return uuid.Nil, model.ErrPayOrderStatusPaid
+	}
+	if order.OrderStatus == model.OrderStatusCANCELLED {
+		return uuid.Nil, model.ErrPayOrderStatusCancelled
+	}
+
+	reqPayCtx, cancelPay := context.WithTimeout(ctx, model.RequestTimeOutUpdate)
+	defer cancelPay()
+
+	transaction_uuid, err := s.PaymentClient.PayOrder(reqPayCtx, order_uuid.String(), order.UserUUID.String(), paymentMethod)
+	if err != nil {
+		return uuid.Nil, err
 	}
 
 	order.OrderStatus = model.OrderStatusPAID
-	order.TransactionUUID = &transaction_uuid
-	order.PaymentMethod = &PaymentMethod
+	order.TransactionUUID = lo.ToPtr(transaction_uuid)
+	order.PaymentMethod = &paymentMethod
 
-	err = s.OrderRepository.UpdateOrder(ctx, order)
+	reqUpdateCtx, cancelUpdate := context.WithTimeout(ctx, model.RequestTimeOutUpdate)
+	defer cancelUpdate()
+
+	err = s.OrderRepository.UpdateOrder(reqUpdateCtx, order)
 	if err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 
 	return transaction_uuid, err

@@ -3,12 +3,18 @@ package payment
 import (
 	"context"
 	"log"
+	"time"
+
+	"payment/internal/model"
 
 	"github.com/google/uuid"
-	"payment/internal/model"
 )
 
-func (s *service) PayOrder(_ context.Context, orderUuid, userUuid, PaymentMethod string) (string, error) {
+const (
+	PayDelay = 1 * time.Second
+)
+
+func (s *service) PayOrder(ctx context.Context, orderUuid, userUuid, paymentMethod string) (string, error) {
 	if orderUuid == "" {
 		return "", model.ErrEmptyOrderUuid
 	}
@@ -17,13 +23,28 @@ func (s *service) PayOrder(_ context.Context, orderUuid, userUuid, PaymentMethod
 		return "", model.ErrEmptyUserUuid
 	}
 
-	if PaymentMethod == "" {
+	if paymentMethod == "" {
 		return "", model.ErrEmptyPaymentMethod
 	}
 
-	transaction_uuid := uuid.NewString()
+	if dl, ok := ctx.Deadline(); ok {
+		log.Printf("⌛ Context with deadline: %v\n", time.Until(dl))
+	} else {
+		log.Printf("⌛ Context with no timeout\n")
+	}
 
-	log.Printf("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid)
+	timer := time.NewTimer(PayDelay)
+	defer timer.Stop()
+	select {
+	case <- timer.C:
+		transaction_uuid := uuid.NewString()
 
-	return transaction_uuid, nil
+		log.Printf("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid)
+
+		return transaction_uuid, nil
+	case <-ctx.Done():
+		return "", ctx.Err()
+		
+	}
+	
 }

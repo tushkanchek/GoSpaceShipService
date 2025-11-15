@@ -1,6 +1,8 @@
 package part
 
 import (
+	"context"
+	"log"
 	"math"
 	"time"
 
@@ -14,7 +16,9 @@ func (r *repository) initParts() {
 	parts := generateParts()
 
 	for _, part := range parts {
-		r.data[part.Uuid] = part
+		if _, err := r.collection.InsertOne(context.Background(), *part); err != nil {
+			log.Printf("failed to insert part %s: %v", part.Uuid, err)
+		}
 	}
 }
 

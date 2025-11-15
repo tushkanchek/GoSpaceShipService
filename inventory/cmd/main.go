@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -8,6 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	partAPI "inventory/internal/api/part/v1"
@@ -30,12 +34,42 @@ func main() {
 		}
 	}()
 
-	s := grpc.NewServer()
+	ctx := context.Background()
 
-	repo := partRepository.NewRepository()
+	err = godotenv.Load(".env")
+	if err != nil {
+		log.Printf("failed to load environment")
+		return
+	}
+
+	dbURI := os.Getenv("MONGO_URI")
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbURI))
+	if err != nil {
+		log.Printf("failed to connect: %v\n", err)
+		return
+	}
+	defer func() {
+		cerr := client.Disconnect(ctx)
+		if cerr != nil {
+			log.Printf("failed to disconnect: %v\n", cerr)
+		}
+	}()
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Printf("failed to ping database: %v\n", err)
+		return
+	}
+
+	dbName := os.Getenv("MONGO_INITDB_DATABASE")
+	db := client.Database(dbName)
+
+	repo := partRepository.NewRepository(db)
 	service := partService.NewService(repo)
 	api := partAPI.NewAPI(service)
 
+	s := grpc.NewServer()
 	inventoryV1.RegisterInventoryServiceServer(s, api)
 
 	// Включаем рефлексию для отладки

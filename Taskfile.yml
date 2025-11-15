@@ -3,7 +3,7 @@ version: '3'
 # Глобальные переменные проекта
 vars:
   GO_VERSION: '1.24.9'
-  GOLANGCI_LINT_VERSION: 'v2.6.0'
+  GOLANGCI_LINT_VERSION: 'v2.1.5'
   GCI_VERSION: 'v0.13.6'
   GOFUMPT_VERSION: 'v0.8.0'
   BUF_VERSION: '1.53.0'
@@ -25,6 +25,7 @@ vars:
   PROTOC_GEN_GO_GRPC: '{{.BIN_DIR}}/protoc-gen-go-grpc'
   MOCKERY: "{{.BIN_DIR}}/mockery"
   GRPCURL: '{{.BIN_DIR}}/grpcurl'
+  ENV_PATH: "{{.ROOT_DIR}}/.env"
 
   NODE_MODULES_DIR: '{{.ROOT_DIR}}/node_modules/.bin'
   REDOCLY: '{{.NODE_MODULES_DIR}}/redocly'
@@ -44,7 +45,7 @@ tasks:
     summary: |
       Эта задача проверяет наличие инструментов форматирования кода gofumpt и gci в директории bin.
       Если инструменты не найдены, они будут автоматически установлены с указанными версиями.
-      
+
       Используется:
         - gofumpt: для форматирования кода Go
         - gci: для сортировки импортов Go
@@ -67,15 +68,15 @@ tasks:
     summary: |
       Форматирует все Go-файлы проекта с использованием gofumpt для стандартизации кода
       и gci для сортировки импортов, исключая файлы в директориях mocks.
-      
+
       Использует инструменты:
         - gofumpt: для стандартизации форматирования
         - gci: для сортировки импортов по стандартным группам
-    deps: [ install-formatters ]
+    deps: [install-formatters]
     cmds:
       - |
         echo "🧼 Форматируем через gofumpt ..."
-        
+
         for module in {{.MODULES}}; do
           if [ -d "$module" ]; then
             echo "🧼 Форматируем $module"
@@ -84,21 +85,20 @@ tasks:
         done
       - |
         echo "🎯 Сортируем импорты через gci ..."
-        
+
         for module in {{.MODULES}}; do
           if [ -d "$module" ]; then
             echo "🎯 Сортируем импорты в $module"
-            find $module -type f -name '*.go' ! -path '*/mocks/*' -exec {{.GCI}} write -s standard -s default -s "prefix(github.com/olezhek28/microservices-course-olezhek-solution)" {} +
+            find $module -type f -name '*.go' ! -path '*/mocks/*' -exec {{.GCI}} write -s standard -s default -s "prefix(github.com/Mahno9/GoMicroservicesCourse)" {} +
           fi
         done
-
 
   install-golangci-lint:
     desc: "Устанавливает golangci-lint в каталог bin"
     summary: |
       Проверяет наличие golangci-lint в директории bin.
       Если инструмент не найден, автоматически устанавливает его через go install.
-      
+
       Устанавливаемая версия: {{.GOLANGCI_LINT_VERSION}}
     cmds:
       - |
@@ -116,14 +116,14 @@ tasks:
       Запускает линтер golangci-lint для всех модулей проекта.
       Линтер проверяет код на соответствие стандартам качества и лучшим практикам.
       Проверка включает проверку безопасности через gosec (встроенный в golangci-lint).
-      
+
       Зависимости:
         - install-golangci-lint: автоматически устанавливает линтер
         - format: форматирует код перед проверкой
-    deps: [ install-golangci-lint ]
+    deps: [install-golangci-lint, format]
     vars:
-      MODULES: '{{.MODULES}}'
-      GOLANGCI_LINT: '{{.GOLANGCI_LINT}}'
+      MODULES: "{{.MODULES}}"
+      GOLANGCI_LINT: "{{.GOLANGCI_LINT}}"
     cmds:
       - |
         set -e
@@ -370,7 +370,61 @@ tasks:
         }
     status:
       - test -x {{.GRPCURL}}
+  up-core:
+    desc: Поднять core контейнеры
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🚀 Поднимаем core контейнеры"
+      - docker compose --env-file {{.ENV_PATH}} up --build --detach
 
+  down-core:
+    desc: Остановить и удалить core контейнеры
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🛑 Останавливаем core контейнеры"
+      - docker compose --env-file {{.ENV_PATH}} down --volumes
+
+  up-inventory:
+    desc: Поднять Inventory сервис и все его зависимости
+    dir: deploy/compose/inventory
+    cmds:
+      - echo "[task] 📦 Поднимаем Inventory с зависимостями"
+      - docker compose --env-file {{.ENV_PATH}} up --build --detach
+
+  down-inventory:
+    desc: Остановить и удалить Inventory сервис и все его зависимости
+    dir: deploy/compose/inventory
+    cmds:
+      - echo "[task] 🛑 Останавливаем Inventory с зависимостями"
+      - docker compose --env-file {{.ENV_PATH}} down --volumes
+
+  up-order:
+    desc: Поднять Order сервис и все его зависимости
+    dir: deploy/compose/order
+    cmds:
+      - echo "[task] 📦 Поднимаем Order с зависимостями"
+      - docker compose --env-file {{.ENV_PATH}} up --build --detach
+
+  down-order:
+    desc: Остановить и удалить Order сервис и все его зависимости
+    dir: deploy/compose/order
+    cmds:
+      - echo "[task] 🛑 Останавливаем Order с зависимостями"
+      - docker compose --env-file {{.ENV_PATH}} down --volumes
+
+  up-all:
+    desc: Поднять все сервисы по очереди вместе с зависимостями
+    cmds:
+      - task up-core
+      - task up-inventory
+      - task up-order
+
+  down-all:
+    desc: Остановить и удалить все сервисы по очереди вместе с зависимостями
+    cmds:
+      - task down-core
+      - task down-inventory
+      - task down-order
   test-api:
     desc: "🧪 Запуск тестов для проверки API микросервисов"
     deps: [ grpcurl:install ]

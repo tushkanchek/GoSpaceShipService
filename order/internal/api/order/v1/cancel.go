@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"order/internal/model"
@@ -11,28 +12,29 @@ import (
 func (a *api) CancelOrder(ctx context.Context, params orderV1.CancelOrderParams) (orderV1.CancelOrderRes, error) {
 	err := a.service.CancelOrder(ctx, params.OrderUUID)
 	if err != nil {
-		switch err {
-		case model.ErrOrderNotFound:
+		if errors.Is(err, model.ErrOrderNotFound) {
 			return &orderV1.NotFoundError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}, nil
-		case model.ErrEmptyOrderUuid:
+		}
+		if errors.Is(err, model.ErrEmptyOrderUuid) {
 			return &orderV1.BadRequestError{
 				Code:    http.StatusBadRequest,
 				Message: err.Error(),
 			}, nil
-		case model.ErrCancelOrderStatusPaid:
+		}
+		if errors.Is(err, model.ErrCancelOrderStatusPaid) {
 			return &orderV1.ConflictError{
 				Code:    http.StatusConflict,
 				Message: err.Error(),
 			}, nil
-		default:
-			return &orderV1.InternalServerError{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}, nil
 		}
+
+		return &orderV1.InternalServerError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}, nil
 	}
 	return &orderV1.CancelOrderNoContent{}, nil
 }

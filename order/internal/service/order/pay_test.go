@@ -1,59 +1,55 @@
 package order
 
 import (
-	"order/internal/model"
+	"context"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/mock"
+	"order/internal/model"
 )
 
-
-
-
 func (s *ServiceSuite) TestPayOrderSucces() {
-	orderUuid := gofakeit.UUID()
+	orderUuid := uuid.MustParse(gofakeit.UUID())
 
-	userUuid := gofakeit.UUID()
+	userUuid := uuid.MustParse(gofakeit.UUID())
 
 	paymentMethod := model.PaymentMethodCARD
 
 	order := &model.Order{
-		OrderUUID: orderUuid,
-		UserUUID: userUuid,
+		OrderUUID:   orderUuid,
+		UserUUID:    userUuid,
 		OrderStatus: model.OrderStatusPENDINGPAYMENT,
 	}
-	
-	transaction_uuid := gofakeit.UUID()
+
+	transaction_uuid := uuid.MustParse(gofakeit.UUID())
 
 	orderPaid := &model.Order{
-		OrderUUID: orderUuid,
-		UserUUID: userUuid,
-		PaymentMethod: &paymentMethod,
+		OrderUUID:       orderUuid,
+		UserUUID:        userUuid,
+		PaymentMethod:   &paymentMethod,
 		TransactionUUID: &transaction_uuid,
-		OrderStatus: model.OrderStatusPAID,
+		OrderStatus:     model.OrderStatusPAID,
 	}
 
-	s.orderRepo.On("GetOrder", s.ctx, orderUuid).Return(order, nil).Once()
-	s.paymentClient.On("PayOrder", s.ctx, orderUuid, userUuid, paymentMethod).Return(transaction_uuid, nil).Once()
-	s.orderRepo.On("UpdateOrder", s.ctx, orderPaid).Return(nil).Once()
+	s.orderRepo.On("GetOrder", mock.Anything, orderUuid).Return(order, nil).Once()
+	s.paymentClient.On("PayOrder", mock.Anything, orderUuid.String(), userUuid.String(), paymentMethod).Return(transaction_uuid, nil).Once()
+	s.orderRepo.On("UpdateOrder", mock.Anything, orderPaid).Return(nil)
 
-	result, err := s.service.PayOrder(s.ctx, orderUuid, paymentMethod)
+	result, err := s.service.PayOrder(context.Background(), orderUuid, paymentMethod)
 
 	s.NoError(err)
 	s.Equal(transaction_uuid, result)
 }
 
-
-
-
 func (s *ServiceSuite) TestPayOrderEmptyOrderUuid() {
-	orderUuid := ""
+	orderUuid := uuid.Nil
 
 	paymentMethod := model.PaymentMethodCARD
 
-
-	result, err := s.service.PayOrder(s.ctx, orderUuid, paymentMethod)
+	ctx := context.Background()
+	result, err := s.service.PayOrder(ctx, orderUuid, paymentMethod)
 
 	s.EqualError(err, model.ErrEmptyOrderUuid.Error())
 	s.Empty(result)
 }
-

@@ -22,7 +22,7 @@ func (a *api) GetOrderByUUID(ctx context.Context, params orderV1.GetOrderByUUIDP
 		if errors.Is(err, model.ErrOrderNotFound) {
 			return &orderV1.NotFoundError{
 				Code:    http.StatusNotFound,
-				Message: "Order for uuid '" + params.OrderUUID + "' not found",
+				Message: "Order for uuid '" + params.OrderUUID.String() + "' not found",
 			}, nil
 		}
 		return &orderV1.InternalServerError{
