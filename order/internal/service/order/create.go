@@ -19,7 +19,11 @@ func (s *service) CreateOrder(ctx context.Context, user_uuid uuid.UUID, part_uui
 	for _, elem := range part_uuids {
 		invPartUuids = append(invPartUuids, elem.String())
 	}
-	resp, err := s.InventoryClient.ListParts(ctx, &model.PartsFilter{
+
+	reqListCtx, cancelList := context.WithTimeout(ctx, model.RequestTimeOutRead)
+	defer cancelList()
+
+	resp, err := s.InventoryClient.ListParts(reqListCtx, &model.PartsFilter{
 		Uuids: invPartUuids,
 	})
 	if len(resp) == 0 {
@@ -42,7 +46,10 @@ func (s *service) CreateOrder(ctx context.Context, user_uuid uuid.UUID, part_uui
 		OrderStatus: model.OrderStatusPENDINGPAYMENT,
 	}
 
-	err = s.OrderRepository.CreateOrder(ctx, order)
+	reqCreateCtx, cancelCreate := context.WithTimeout(ctx, model.RequestTimeOutUpdate)
+	defer cancelCreate()
+
+	err = s.OrderRepository.CreateOrder(reqCreateCtx, order)
 	if err != nil {
 		return nil, err
 	}

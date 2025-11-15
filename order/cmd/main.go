@@ -38,7 +38,7 @@ const (
 	paymentAdress     = "50052"
 
 	envPathDefault = ".env"
-	DB_URI = "DB_URI"
+	DB_URI         = "DB_URI"
 	MIGRATIONS_DIR = "MIGRATIONS_DIR"
 )
 

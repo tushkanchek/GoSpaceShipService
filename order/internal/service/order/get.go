@@ -12,7 +12,10 @@ func (s *service) GetOrderByUUID(ctx context.Context, order_uuid uuid.UUID) (*mo
 		return nil, model.ErrEmptyOrderUuid
 	}
 
-	order, err := s.OrderRepository.GetOrder(ctx, order_uuid)
+	reqGetCtx, cancelGet := context.WithTimeout(ctx, model.RequestTimeOutRead)
+	defer cancelGet()
+
+	order, err := s.OrderRepository.GetOrder(reqGetCtx, order_uuid)
 	if err != nil {
 		return nil, err
 	}

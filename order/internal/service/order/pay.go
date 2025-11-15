@@ -13,7 +13,11 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMet
 	if order_uuid == uuid.Nil {
 		return uuid.Nil, model.ErrEmptyOrderUuid
 	}
-	order, err := s.OrderRepository.GetOrder(ctx, order_uuid)
+
+	reqGetCtx, cancelGet := context.WithTimeout(ctx, model.RequestTimeOutRead)
+	defer cancelGet()
+
+	order, err := s.OrderRepository.GetOrder(reqGetCtx, order_uuid)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -27,7 +31,10 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMet
 		return uuid.Nil, model.ErrPayOrderStatusCancelled
 	}
 
-	transaction_uuid, err := s.PaymentClient.PayOrder(ctx, order_uuid.String(), order.UserUUID.String(), paymentMethod)
+	reqPayCtx, cancelPay := context.WithTimeout(ctx, model.RequestTimeOutUpdate)
+	defer cancelPay()
+
+	transaction_uuid, err := s.PaymentClient.PayOrder(reqPayCtx, order_uuid.String(), order.UserUUID.String(), paymentMethod)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -36,7 +43,10 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMet
 	order.TransactionUUID = lo.ToPtr(transaction_uuid)
 	order.PaymentMethod = &paymentMethod
 
-	err = s.OrderRepository.UpdateOrder(ctx, order)
+	reqUpdateCtx, cancelUpdate := context.WithTimeout(ctx, model.RequestTimeOutUpdate)
+	defer cancelUpdate()
+
+	err = s.OrderRepository.UpdateOrder(reqUpdateCtx, order)
 	if err != nil {
 		return uuid.Nil, err
 	}
