@@ -3,11 +3,10 @@ package order
 import (
 	"context"
 
-	"order/internal/model"
-
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+	"order/internal/model"
 )
 
 func (s *ServiceSuite) TestPayOrderSucces() {

@@ -3,11 +3,10 @@ package order
 import (
 	"context"
 
-	"order/internal/model"
-
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+	"order/internal/model"
 )
 
 func (s *ServiceSuite) TestGetOrderSucces() {
@@ -17,7 +16,6 @@ func (s *ServiceSuite) TestGetOrderSucces() {
 		OrderUUID: order_uuid,
 	}
 
-	
 	s.orderRepo.On("GetOrder", mock.Anything, order_uuid).Return(order, nil)
 
 	ctx := context.Background()
@@ -40,7 +38,6 @@ func (s *ServiceSuite) TestGetOrderEmptyOrderUuid() {
 func (s *ServiceSuite) TestGetOrderNotFound() {
 	order_uuid := uuid.MustParse(gofakeit.UUID())
 
-	
 	s.orderRepo.On("GetOrder", mock.Anything, order_uuid).Return(nil, model.ErrOrderNotFound)
 
 	ctx := context.Background()

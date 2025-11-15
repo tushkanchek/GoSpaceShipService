@@ -7,6 +7,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type Order struct {
+	OrderUUID       uuid.UUID
+	UserUUID        uuid.UUID
+	PartUuids       []uuid.UUID
+	TotalPrice      float64
+	TransactionUUID *uuid.UUID
+	PaymentMethod   *PaymentMethod
+	OrderStatus     OrderStatus
+}
+
 type PaymentMethod int32
 
 const (
@@ -17,6 +27,7 @@ const (
 	PaymentMethodInvestorMoney PaymentMethod = 4
 )
 
+// Реализуем интерфейс Scaner, для извлечения PaymentMethod из postgres
 func (p *PaymentMethod) Scan(src any) error {
 	switch v := src.(type) {
 	case string:
@@ -39,6 +50,7 @@ func (p *PaymentMethod) Scan(src any) error {
 	return nil
 }
 
+// Реализуем интерфейс Value, для вставки PaymentMethod в postgres
 func (p PaymentMethod) Value() (driver.Value, error) {
 	switch p {
 	case PaymentMethodSBP:
@@ -63,6 +75,7 @@ const (
 	OrderStatusCANCELLED      OrderStatus = "CANCELLED"
 )
 
+// Реализуем интерфейс Scaner, для извлечения OrderStatus из postgres
 func (o *OrderStatus) Scan(src any) error {
 	switch v := src.(type) {
 	case string:
@@ -82,16 +95,7 @@ func (o *OrderStatus) Scan(src any) error {
 	return nil
 }
 
+// Реализуем интерфейс Value, для вставки OrderStatus в postgres
 func (o OrderStatus) Value() (driver.Value, error) {
 	return string(o), nil
-}
-
-type Order struct {
-	OrderUUID       uuid.UUID
-	UserUUID        uuid.UUID
-	PartUuids       []uuid.UUID
-	TotalPrice      float64
-	TransactionUUID *uuid.UUID
-	PaymentMethod   *PaymentMethod
-	OrderStatus     OrderStatus
 }
