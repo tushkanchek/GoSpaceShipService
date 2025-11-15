@@ -3,9 +3,11 @@ package order
 import (
 	"context"
 
+	"order/internal/model"
+
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
-	"order/internal/model"
+	"github.com/stretchr/testify/mock"
 )
 
 func (s *ServiceSuite) TestPayOrderSucces() {
@@ -31,12 +33,11 @@ func (s *ServiceSuite) TestPayOrderSucces() {
 		OrderStatus:     model.OrderStatusPAID,
 	}
 
-	ctx := context.Background()
-	s.orderRepo.On("GetOrder", ctx, orderUuid).Return(order, nil).Once()
-	s.paymentClient.On("PayOrder", ctx, orderUuid.String(), userUuid.String(), paymentMethod).Return(transaction_uuid, nil).Once()
-	s.orderRepo.On("UpdateOrder", ctx, orderPaid).Return(nil)
+	s.orderRepo.On("GetOrder", mock.Anything, orderUuid).Return(order, nil).Once()
+	s.paymentClient.On("PayOrder", mock.Anything, orderUuid.String(), userUuid.String(), paymentMethod).Return(transaction_uuid, nil).Once()
+	s.orderRepo.On("UpdateOrder", mock.Anything, orderPaid).Return(nil)
 
-	result, err := s.service.PayOrder(ctx, orderUuid, paymentMethod)
+	result, err := s.service.PayOrder(context.Background(), orderUuid, paymentMethod)
 
 	s.NoError(err)
 	s.Equal(transaction_uuid, result)

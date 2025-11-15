@@ -44,9 +44,9 @@ func (s *ServiceSuite) TestCreateOrderSucces() {
 	}
 
 	ctx := context.Background()
-	s.inventoryClient.On("ListParts", ctx, filter).Return(parts, nil).Once()
+	s.inventoryClient.On("ListParts", mock.Anything, filter).Return(parts, nil).Once()
 
-	s.orderRepo.On("CreateOrder", ctx, mock.MatchedBy(func(o *model.Order) bool {
+	s.orderRepo.On("CreateOrder", mock.Anything, mock.MatchedBy(func(o *model.Order) bool {
 		return o.UserUUID == user_uuid &&
 			len(o.PartUuids) == len(part_uuids) &&
 			price1+price2 == o.TotalPrice &&
@@ -91,9 +91,9 @@ func (s *ServiceSuite) TestCreateOrderAlreadyExists() {
 	}
 
 	ctx := context.Background()
-	s.inventoryClient.On("ListParts", ctx, filter).Return(parts, nil).Once()
+	s.inventoryClient.On("ListParts", mock.Anything, filter).Return(parts, nil).Once()
 
-	s.orderRepo.On("CreateOrder", ctx, mock.MatchedBy(func(o *model.Order) bool {
+	s.orderRepo.On("CreateOrder", mock.Anything, mock.MatchedBy(func(o *model.Order) bool {
 		return o.UserUUID == user_uuid &&
 			len(o.PartUuids) == len(part_uuids) &&
 			math.Abs(o.TotalPrice-(price1+price2)) < 0.0001 &&

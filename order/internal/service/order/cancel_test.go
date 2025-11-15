@@ -18,8 +18,8 @@ func (s *ServiceSuite) TestCancelOrderSucces() {
 	}
 
 	ctx := context.Background()
-	s.orderRepo.On("GetOrder", ctx, orderUuid).Return(order, nil).Once()
-	s.orderRepo.On("UpdateOrder", ctx,
+	s.orderRepo.On("GetOrder", mock.Anything, orderUuid).Return(order, nil).Once()
+	s.orderRepo.On("UpdateOrder", mock.Anything,
 		mock.MatchedBy(func(updatedOrder *model.Order) bool {
 			return updatedOrder.OrderStatus == model.OrderStatusCANCELLED &&
 				updatedOrder.OrderUUID == orderUuid
@@ -34,7 +34,7 @@ func (s *ServiceSuite) TestCancelOrderNotFound() {
 	orderUuid := uuid.MustParse(gofakeit.UUID())
 
 	ctx := context.Background()
-	s.orderRepo.On("GetOrder", ctx, orderUuid).Return(nil, model.ErrOrderNotFound).Once()
+	s.orderRepo.On("GetOrder", mock.Anything, orderUuid).Return(nil, model.ErrOrderNotFound).Once()
 
 	err := s.service.CancelOrder(ctx, orderUuid)
 	s.EqualError(err, model.ErrOrderNotFound.Error())
@@ -48,7 +48,7 @@ func (s *ServiceSuite) TestCancelOrderAlreadyPaid() {
 	}
 
 	ctx := context.Background()
-	s.orderRepo.On("GetOrder", ctx, orderUuid).Return(order, nil).Once()
+	s.orderRepo.On("GetOrder", mock.Anything, orderUuid).Return(order, nil).Once()
 
 	err := s.service.CancelOrder(ctx, orderUuid)
 	s.EqualError(err, model.ErrCancelOrderStatusPaid.Error())
