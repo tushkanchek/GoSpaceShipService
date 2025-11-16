@@ -16,6 +16,8 @@ func RepoPartToModel(part repoModel.Part) *model.Part {
 		Dimensions:    RepoDimensionToDimension(*part.Dimensions),
 		Manufacturer:  RepoManufacturerToManufacturer(*part.Manufacturer),
 		Tags:          part.Tags,
+		CreatedAt: part.CreatedAt,
+		UpdatedAt: part.UpdatedAt,
 	}
 }
 

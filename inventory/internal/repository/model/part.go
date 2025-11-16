@@ -32,7 +32,7 @@ type Part struct {
 	Name          string         `bson:"name"`
 	Description   string         `bson:"description"`
 	Price         float64        `bson:"price"`
-	StockQuantity int64          `bson:"stockquantity"`
+	StockQuantity int64          `bson:"stock_quantity"`
 	Category      Category       `bson:"category"`
 	Dimensions    *Dimensions    `bson:"dimensions,omitempty"`
 	Manufacturer  *Manufacturer  `bson:"manufacturer,omitempty"`
