@@ -3,12 +3,10 @@ services:
     image: postgres:17.0-alpine3.20
 
     container_name: postgres-order
+
     env_file:
-      - ../../../.env
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      - .env
+  
     volumes:
       - postgres_order_data:/var/lib/postgresql/data
 

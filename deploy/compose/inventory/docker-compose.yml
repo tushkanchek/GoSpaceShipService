@@ -3,12 +3,10 @@ services:
     image: mongo:7.0.5
 
     container_name: mongo-inventory
+
     env_file:
-      - ../../../.env
-    environment:
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      - .env
+
     ports:
       - "${MONGO_PORT}:27017"
     volumes:
