@@ -1,51 +1,49 @@
 package config
 
 import (
-	"inventory/internal/config/env"
 	"os"
 
 	"github.com/joho/godotenv"
+	"inventory/internal/config/env"
 )
-
 
 var appConfig *config
 
-type config struct{
-	Logger LoggerConfig
-	InventoryGRPC InventoryGRPCConfig	
-	Mongo MongoConfig
+type config struct {
+	Logger        LoggerConfig
+	InventoryGRPC InventoryGRPCConfig
+	Mongo         MongoConfig
 }
-
 
 func Load(path ...string) error {
 	err := godotenv.Load(path...)
-	if err!=nil && os.IsNotExist(err){
+	if err != nil && os.IsNotExist(err) {
 		return err
 	}
 
 	loggerCfg, err := env.NewLoggerConfig()
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	grpcCfg, err := env.NewInventoryGRPCConfig()
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	mongoCfg, err := env.NewMongoConfig()
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	appConfig = &config{
-		Logger: loggerCfg,
+		Logger:        loggerCfg,
 		InventoryGRPC: grpcCfg,
-		Mongo: mongoCfg,
+		Mongo:         mongoCfg,
 	}
 	return nil
 }
 
-func AppConfig() *config{
+func AppConfig() *config {
 	return appConfig
 }

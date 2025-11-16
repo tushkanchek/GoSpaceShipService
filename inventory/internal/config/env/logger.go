@@ -4,20 +4,18 @@ import (
 	"github.com/caarlos0/env/v11"
 )
 
-
-type LoggerEnvConfig struct{
-	Level string	`env:"LOGGER_LEVEL,required"`
-	AsJson	bool	`env:"LOGGER_AS_JSON,required"`
+type LoggerEnvConfig struct {
+	Level  string `env:"LOGGER_LEVEL,required"`
+	AsJson bool   `env:"LOGGER_AS_JSON,required"`
 }
 
-type loggerConfig struct{
+type loggerConfig struct {
 	raw LoggerEnvConfig
 }
 
-
 func NewLoggerConfig() (*loggerConfig, error) {
 	var raw LoggerEnvConfig
-	if err := env.Parse(&raw);err!=nil {
+	if err := env.Parse(&raw); err != nil {
 		return nil, err
 	}
 
@@ -26,11 +24,10 @@ func NewLoggerConfig() (*loggerConfig, error) {
 	}, nil
 }
 
-func (cfg *loggerConfig) Level() string{
+func (cfg *loggerConfig) Level() string {
 	return cfg.raw.Level
 }
 
-func (cfg *loggerConfig) AsJson() bool{
+func (cfg *loggerConfig) AsJson() bool {
 	return cfg.raw.AsJson
 }
-

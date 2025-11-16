@@ -5,9 +5,8 @@ import (
 	"log"
 	"time"
 
-	"payment/internal/model"
-
 	"github.com/google/uuid"
+	"payment/internal/model"
 )
 
 const (
@@ -36,7 +35,7 @@ func (s *service) PayOrder(ctx context.Context, orderUuid, userUuid, paymentMeth
 	timer := time.NewTimer(PayDelay)
 	defer timer.Stop()
 	select {
-	case <- timer.C:
+	case <-timer.C:
 		transaction_uuid := uuid.NewString()
 
 		log.Printf("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid)
@@ -44,7 +43,6 @@ func (s *service) PayOrder(ctx context.Context, orderUuid, userUuid, paymentMeth
 		return transaction_uuid, nil
 	case <-ctx.Done():
 		return "", ctx.Err()
-		
+
 	}
-	
 }

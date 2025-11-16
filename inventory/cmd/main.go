@@ -10,24 +10,22 @@ import (
 	"syscall"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	partAPI "inventory/internal/api/part/v1"
 	"inventory/internal/config"
 	partRepository "inventory/internal/repository/part"
 	partService "inventory/internal/service/part"
 	inventoryV1 "shared/pkg/proto/inventory/v1"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 const configPath = "./deploy/compose/inventory/.env"
 
 func main() {
-
 	err := config.Load(configPath)
-	if err!=nil{
+	if err != nil {
 		panic(fmt.Errorf("failed to load config: %w", err))
 	}
 
@@ -69,19 +67,18 @@ func main() {
 	// Create GRPC server
 	s := grpc.NewServer()
 
-	//Register Service
+	// Register Service
 	repo := partRepository.NewRepository(mongoClient.Database(config.AppConfig().Mongo.DatabaseName()))
 	service := partService.NewService(repo)
 	api := partAPI.NewAPI(service)
 
-	
 	inventoryV1.RegisterInventoryServiceServer(s, api)
 
 	// Включаем рефлексию для отладки
 	reflection.Register(s)
 
 	go func() {
-		log.Printf("🚀 gRPC server listening on %d\n", config.AppConfig().InventoryGRPC.Adress())
+		log.Printf("🚀 gRPC server listening on %s\n", config.AppConfig().InventoryGRPC.Adress())
 		err = s.Serve(lis)
 		if err != nil {
 			log.Printf("failed to serve: %v\n", err)

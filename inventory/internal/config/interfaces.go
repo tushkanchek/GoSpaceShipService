@@ -1,17 +1,15 @@
 package config
 
-
-type LoggerConfig interface{
+type LoggerConfig interface {
 	Level() string
 	AsJson() bool
 }
 
-
-type InventoryGRPCConfig interface{
+type InventoryGRPCConfig interface {
 	Adress() string
 }
 
-type MongoConfig interface{
+type MongoConfig interface {
 	URI() string
 	DatabaseName() string
 }
