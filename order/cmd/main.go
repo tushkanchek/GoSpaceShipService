@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,12 +16,12 @@ import (
 	"github.com/go-chi/render"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	orderV1API "order/internal/api/order/v1"
 	clientInventory "order/internal/client/grpc/inventory/v1"
 	clientPayment "order/internal/client/grpc/payment/v1"
+	"order/internal/config"
 	"order/internal/migrator"
 	repoOrder "order/internal/repository/order"
 	serviceOrder "order/internal/service/order"
@@ -31,82 +31,76 @@ import (
 )
 
 const (
-	httpPort          = "8080"
-	readHeaderTimeout = 5 * time.Second
-	shutdownTimeout   = 10 * time.Second
-	inventoryAdress   = "50051"
-	paymentAdress     = "50052"
-
-	envPathDefault = ".env"
-	DB_URI         = "DB_URI"
-	MIGRATIONS_DIR = "MIGRATIONS_DIR"
+	configPath = "./deploy/compose/order/.env"
 )
 
 func main() {
-	ctx := context.Background()
-
-	err := godotenv.Load(envPathDefault)
+	err := config.Load(configPath)
 	if err != nil {
-		log.Printf("failed to load .env file: %v\n", err)
-		return
+		panic(fmt.Errorf("failed to load config: %w", err))
 	}
 
-	dbURI := os.Getenv(DB_URI)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	con, err := pgx.Connect(ctx, dbURI)
+	// Create connection to postgres
+	con, err := pgx.Connect(ctx, config.AppConfig().Postgres.URI())
 	if err != nil {
 		log.Printf("failed connect to db: %v\n", err)
 		return
 	}
 	defer func() {
-		cerr := con.Close(ctx)
+		cerr := con.Close(context.Background())
 		if cerr != nil {
 			log.Printf("failed to close connection: %v\n", cerr)
 		}
 	}()
 
+	// Check the connection to Postgresql
 	err = con.Ping(ctx)
 	if err != nil {
-		log.Printf("data base is unavailable")
+		log.Printf("data base is unavailable: %v\n", err)
 		return
 	}
+	log.Println("✅ Connected to postgres")
 
-	migrationDir := os.Getenv(MIGRATIONS_DIR)
-	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*con.Config().Copy()), migrationDir)
+	// Activate migrations
+	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*con.Config().Copy()), config.AppConfig().Postgres.MigrationDir())
 
 	err = migratorRunner.Up()
 	if err != nil {
 		log.Printf("Migration error: %v\n", err)
 	}
 
+	// Create Inventory GRPC service client
 	invConn, err := grpc.NewClient(
-		"localhost:"+inventoryAdress,
+		config.AppConfig().InventoryGRPC.Adress(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		log.Printf("Failed connect to inventory: %v\n", err)
 		return
 	}
-
 	invClient := inventoryV1.NewInventoryServiceClient(invConn)
 
+	// Create Payment GRPC service client
 	payConn, err := grpc.NewClient(
-		"localhost:"+paymentAdress,
+		config.AppConfig().PaymentGRPC.Adress(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		log.Printf("Failed connect to payment: %v\n", err)
 		return
 	}
-
 	payClient := paymentV1.NewPaymentServiceClient(payConn)
 
+	// Create GRPC Clients
 	gprcInventory := clientInventory.NewClient(invClient)
 
-	gprcPayment := clientPayment.NewClient(shutdownTimeout, payClient)
+	gprcPayment := clientPayment.NewClient(payClient)
+	log.Printf("✅ Succesfully created grpc clients")
 
-	log.Printf("Succesfully created grpc clients")
-
+	// Register OpenAPI server
 	repo := repoOrder.NewOrderRepository(con) // Подумать про реализацию Pool
 
 	service := serviceOrder.NewService(repo, gprcInventory, gprcPayment)
@@ -118,6 +112,8 @@ func main() {
 		log.Printf("Ошибка при создании сервера OpenAPI: %v", err)
 		return
 	}
+
+	// Create and configure router
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
@@ -127,14 +123,14 @@ func main() {
 	r.Mount("/", orderServer)
 
 	server := &http.Server{
-		Addr:              net.JoinHostPort("localhost", httpPort),
+		Addr:              config.AppConfig().OrderHTTP.Adress(),
 		Handler:           r,
-		ReadHeaderTimeout: readHeaderTimeout,
+		ReadHeaderTimeout: config.AppConfig().OrderHTTP.ReadTimeout(),
 	}
 
 	// Запускаем сервер в отдельной горутине
 	go func() {
-		log.Printf("🚀 HTTP-сервер запущен на порту %s\n", httpPort)
+		log.Printf("🚀 HTTP-сервер запущен на %s\n", config.AppConfig().OrderHTTP.Adress())
 		err = server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("❌ Ошибка запуска сервера: %v\n", err)
@@ -149,7 +145,7 @@ func main() {
 	log.Println("🛑 Завершение работы сервера...")
 
 	// Создаем контекст с таймаутом для остановки сервера
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	err = server.Shutdown(ctx)
