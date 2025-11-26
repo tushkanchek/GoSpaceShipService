@@ -2,11 +2,13 @@ package payment
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"platform/pkg/logger"
 	"time"
 
-	"github.com/google/uuid"
 	"payment/internal/model"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -27,9 +29,9 @@ func (s *service) PayOrder(ctx context.Context, orderUuid, userUuid, paymentMeth
 	}
 
 	if dl, ok := ctx.Deadline(); ok {
-		log.Printf("⌛ Context with deadline: %v\n", time.Until(dl))
+		logger.Info(ctx, fmt.Sprintf("⌛ Context with deadline: %v\n", time.Until(dl)))
 	} else {
-		log.Printf("⌛ Context with no timeout\n")
+		logger.Info(ctx, "⌛ Context with no timeout\n")
 	}
 
 	timer := time.NewTimer(PayDelay)
@@ -38,7 +40,7 @@ func (s *service) PayOrder(ctx context.Context, orderUuid, userUuid, paymentMeth
 	case <-timer.C:
 		transaction_uuid := uuid.NewString()
 
-		log.Printf("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid)
+		logger.Info(ctx, fmt.Sprint("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid))
 
 		return transaction_uuid, nil
 	case <-ctx.Done():

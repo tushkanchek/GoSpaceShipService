@@ -1,19 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
-	"net"
-	"os"
 	"os/signal"
+	"platform/pkg/closer"
+	"platform/pkg/logger"
 	"syscall"
+	"time"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	paymentAPI "payment/internal/api/payment/v1"
+
+	"payment/internal/app"
 	"payment/internal/config"
-	paymentService "payment/internal/service/payment"
-	paymentV1 "shared/pkg/proto/payment/v1"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -27,44 +27,31 @@ func main() {
 		panic(fmt.Errorf("failed load config: %w", err))
 	}
 
-	// Start listen
-	lis, err := net.Listen("tcp", config.AppConfig().PaymentGRPC.Adress())
+	appCtx, appCancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer appCancel()
+	defer gracefulShutdown()
+
+	closer.Configure(syscall.SIGINT, syscall.SIGTERM)
+
+	a, err := app.New(appCtx)
 	if err != nil {
-		log.Printf("Failed to listen: %v\n", err)
+		logger.Error(appCtx, "failed to create app: %v", zap.Error(err))
 		return
 	}
-	defer func() {
-		if cerr := lis.Close(); cerr != nil {
-			log.Printf("Failed to close listener: %v\n", cerr)
-		}
-	}()
 
-	// Create GRPC server
-	s := grpc.NewServer()
+	err = a.Run(appCtx)
+	if err != nil {
+		logger.Error(appCtx, "failed to run gRPC server: %v", zap.Error(err))
+		return
+	}
+}
 
-	// Register Service
-	service := paymentService.NewService()
-	api := paymentAPI.NewAPI(service)
 
-	paymentV1.RegisterPaymentServiceServer(s, api)
+func gracefulShutdown() {
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
 
-	// Turn on reflection for debugging
-	reflection.Register(s)
-
-	go func() {
-		log.Printf("🚀 gRPC server listening on %s\n", config.AppConfig().PaymentGRPC.Adress())
-		err = s.Serve(lis)
-		if err != nil {
-			log.Printf("failed to serve: %v\n", err)
-			return
-		}
-	}()
-
-	// Graceful shutdown
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("🛑 Shutting down gRPC server...")
-	s.GracefulStop()
-	log.Println("✅ Server stopped")
+	if err:=closer.CloseAll(ctx);err!=nil {
+		logger.Error(ctx, "❌ error during Shutdown process", zap.Error(err))
+	}
 }
