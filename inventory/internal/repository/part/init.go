@@ -12,11 +12,11 @@ import (
 	repoModel "inventory/internal/repository/model"
 )
 
-func (r *repository) initParts() {
+func (r *repository) initParts(ctx context.Context) {
 	parts := generateParts()
 
 	for _, part := range parts {
-		if _, err := r.collection.InsertOne(context.Background(), *part); err != nil {
+		if _, err := r.collection.InsertOne(ctx, *part); err != nil {
 			log.Printf("failed to insert part %s: %v", part.Uuid, err)
 		}
 	}
