@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"platform/pkg/logger"
 )
 
 type ServiceSuite struct {
@@ -13,6 +14,8 @@ type ServiceSuite struct {
 }
 
 func (s *ServiceSuite) SetupTest() {
+	logger.SetNopLogger()
+
 	s.service = NewService()
 }
 

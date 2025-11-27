@@ -19,7 +19,7 @@ func (s *ServiceSuite) TestPayOrderSucces() {
 
 	s.NoError(err)
 
-	s.Require().NotNil(result)
+	s.Require().NotEmpty(result)
 }
 
 func (s *ServiceSuite) TestPayOrderEmptyOrderUuid() {
