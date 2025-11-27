@@ -3,12 +3,11 @@ package payment
 import (
 	"context"
 	"fmt"
-	"platform/pkg/logger"
 	"time"
 
-	"payment/internal/model"
-
 	"github.com/google/uuid"
+	"payment/internal/model"
+	"platform/pkg/logger"
 )
 
 const (
@@ -40,7 +39,7 @@ func (s *service) PayOrder(ctx context.Context, orderUuid, userUuid, paymentMeth
 	case <-timer.C:
 		transaction_uuid := uuid.NewString()
 
-		logger.Info(ctx, fmt.Sprint("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid))
+		logger.Info(ctx, fmt.Sprintf("Оплата успешно прошла, transaction_uuid: %s\n", transaction_uuid))
 
 		return transaction_uuid, nil
 	case <-ctx.Done():
