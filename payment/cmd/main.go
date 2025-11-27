@@ -4,16 +4,14 @@ import (
 	"context"
 	"fmt"
 	"os/signal"
-	"platform/pkg/closer"
-	"platform/pkg/logger"
 	"syscall"
 	"time"
 
-
+	"go.uber.org/zap"
 	"payment/internal/app"
 	"payment/internal/config"
-
-	"go.uber.org/zap"
+	"platform/pkg/closer"
+	"platform/pkg/logger"
 )
 
 const (
@@ -46,12 +44,11 @@ func main() {
 	}
 }
 
-
 func gracefulShutdown() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if err:=closer.CloseAll(ctx);err!=nil {
+	if err := closer.CloseAll(ctx); err != nil {
 		logger.Error(ctx, "❌ error during Shutdown process", zap.Error(err))
 	}
 }

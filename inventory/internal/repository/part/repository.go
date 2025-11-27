@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	def "inventory/internal/repository"
+	"platform/pkg/logger"
 )
 
 var _ def.InventoryRepository = (*repository)(nil)
@@ -27,7 +28,8 @@ func NewRepository(ctx context.Context, db *mongo.Database) *repository {
 
 	_, err := collection.Indexes().CreateMany(ctx, indexModels)
 	if err != nil {
-		panic(err)
+		logger.Error(ctx, err.Error())
+		return nil
 	}
 
 	r := &repository{

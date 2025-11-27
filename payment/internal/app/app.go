@@ -4,24 +4,21 @@ import (
 	"context"
 	"fmt"
 	"net"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
 	"payment/internal/config"
 	"platform/pkg/closer"
 	"platform/pkg/grpc/health"
 	"platform/pkg/logger"
 	paymentV1 "shared/pkg/proto/payment/v1"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
 )
-
-
-
 
 type App struct {
 	diContainer *diContainer
-	grpcServer *grpc.Server
-	listener net.Listener
+	grpcServer  *grpc.Server
+	listener    net.Listener
 }
 
 func New(ctx context.Context) (*App, error) {
@@ -35,9 +32,6 @@ func New(ctx context.Context) (*App, error) {
 	return a, nil
 }
 
-
-
-
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		a.initDI,
@@ -49,7 +43,7 @@ func (a *App) initDeps(ctx context.Context) error {
 
 	for _, f := range inits {
 		err := f(ctx)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 	}
@@ -113,7 +107,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 }
 
 func (a *App) runGRPCServer(ctx context.Context) error {
-	logger.Info(ctx, fmt.Sprintf("🚀 gRPC InventoryService server listening on %s", config.AppConfig().PaymentGRPC.Adress()))
+	logger.Info(ctx, fmt.Sprintf("🚀 gRPC PaymentService server listening on %s", config.AppConfig().PaymentGRPC.Adress()))
 
 	err := a.grpcServer.Serve(a.listener)
 	if err != nil {
