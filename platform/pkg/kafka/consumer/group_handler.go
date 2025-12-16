@@ -3,7 +3,6 @@ package consumer
 import (
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
-
 	"platform/pkg/kafka"
 )
 

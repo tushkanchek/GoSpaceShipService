@@ -2,11 +2,10 @@ package consumer
 
 import (
 	"context"
+	"errors"
 
 	"github.com/IBM/sarama"
-	"errors"
 	"go.uber.org/zap"
-
 	"platform/pkg/kafka"
 )
 

@@ -1,11 +1,8 @@
 package env
 
 import (
-
 	"github.com/caarlos0/env/v11"
 )
-
-
 
 type kafkaEnvConfig struct {
 	Brokers []string `env:"KAFKA_BROKERS,required"`
@@ -17,7 +14,7 @@ type kafkaConfig struct {
 
 func NewKafkaConfig() (*kafkaConfig, error) {
 	var raw kafkaEnvConfig
-	if err := env.Parse(&raw);err!=nil{
+	if err := env.Parse(&raw); err != nil {
 		return nil, err
 	}
 
@@ -26,6 +23,6 @@ func NewKafkaConfig() (*kafkaConfig, error) {
 	}, nil
 }
 
-func (k *kafkaConfig) Brokers() []string{
+func (k *kafkaConfig) Brokers() []string {
 	return k.raw.Brokers
 }

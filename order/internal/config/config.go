@@ -8,13 +8,13 @@ import (
 var appConfig *config
 
 type config struct {
-	Logger        		LoggerConfig
-	OrderHTTP     		OrderHTTPConfig
-	Postgres      		PostgresConfig
-	InventoryGRPC 		InventoryGRPCConfig
-	PaymentGRPC   		PaymentGRPCConfig
-	Kafka 		  		KafkaConfig
-	OrderPaidProducer 	OrderPaidProducerConfig
+	Logger            LoggerConfig
+	OrderHTTP         OrderHTTPConfig
+	Postgres          PostgresConfig
+	InventoryGRPC     InventoryGRPCConfig
+	PaymentGRPC       PaymentGRPCConfig
+	Kafka             KafkaConfig
+	OrderPaidProducer OrderPaidProducerConfig
 }
 
 func Load(path ...string) error {
@@ -59,12 +59,12 @@ func Load(path ...string) error {
 	}
 
 	appConfig = &config{
-		Logger:        loggerCfg,
-		OrderHTTP:     orderHTTPCfg,
-		Postgres:      postgresCfg,
-		InventoryGRPC: inventoryGRPCCfg,
-		PaymentGRPC:   paymentGRPCCfg,
-		Kafka: kafkaCfg,
+		Logger:            loggerCfg,
+		OrderHTTP:         orderHTTPCfg,
+		Postgres:          postgresCfg,
+		InventoryGRPC:     inventoryGRPCCfg,
+		PaymentGRPC:       paymentGRPCCfg,
+		Kafka:             kafkaCfg,
 		OrderPaidProducer: orderPaidProducerCfg,
 	}
 	return nil

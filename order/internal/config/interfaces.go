@@ -38,4 +38,3 @@ type OrderPaidProducerConfig interface {
 	Topic() string
 	Config() *sarama.Config
 }
-

@@ -2,13 +2,12 @@ package order
 
 import (
 	"context"
-	"platform/pkg/logger"
-
-	"order/internal/model"
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
+	"order/internal/model"
+	"platform/pkg/logger"
 )
 
 // TODO: check orderstatus cancel
@@ -62,12 +61,12 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMet
 		logger.Error(ctx, "couldn't create event uuid", zap.Error(err))
 		return uuid.Nil, err
 	}
-	//Kafka Producer
+	// Kafka Producer
 	err = s.orderProducerService.ProduceOrderPaid(ctx, model.OrderPaidEvent{
-		EventUuid:     eventUuid,
-		OrderUuid:     order_uuid,
-		UserUuid:      order.UserUUID,
-		PaymentMethod: int32(paymentMethod),
+		EventUuid:       eventUuid,
+		OrderUuid:       order_uuid,
+		UserUuid:        order.UserUUID,
+		PaymentMethod:   int32(paymentMethod),
 		TransactionUuid: transaction_uuid,
 	})
 	if err != nil {

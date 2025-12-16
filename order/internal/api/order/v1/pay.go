@@ -8,13 +8,10 @@ import (
 	"order/internal/converter"
 	"order/internal/model"
 	orderV1 "shared/pkg/openapi/order/v1"
-
 )
-
 
 func (a *api) PayOrder(ctx context.Context, req *orderV1.PayOrderRequest, params orderV1.PayOrderParams) (orderV1.PayOrderRes, error) {
 	transaction_uuid, err := a.service.PayOrder(ctx, params.OrderUUID, converter.PaymentMethodApiToModel(req.PaymentMethod))
-	
 	if err != nil {
 		if errors.Is(err, model.ErrOrderNotFound) {
 			return &orderV1.NotFoundError{

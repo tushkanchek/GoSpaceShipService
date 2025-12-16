@@ -3,19 +3,18 @@ package order
 import (
 	"testing"
 
+	"github.com/stretchr/testify/suite"
 	grpcMocks "order/internal/client/grpc/mocks"
 	repoMocks "order/internal/repository/mocks"
 	"order/internal/service/mocks"
-
-	"github.com/stretchr/testify/suite"
 )
 
 type ServiceSuite struct {
 	suite.Suite
 
-	orderRepo       *repoMocks.OrderRepository
-	inventoryClient *grpcMocks.InventoryClient
-	paymentClient   *grpcMocks.PaymentClient
+	orderRepo         *repoMocks.OrderRepository
+	inventoryClient   *grpcMocks.InventoryClient
+	paymentClient     *grpcMocks.PaymentClient
 	orderPaidProducer *mocks.OrderProducerService
 
 	service *service

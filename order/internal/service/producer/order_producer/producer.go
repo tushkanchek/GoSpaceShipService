@@ -2,18 +2,17 @@ package orderproducer
 
 import (
 	"context"
-	"order/internal/model"
-	"platform/pkg/kafka"
-	"platform/pkg/logger"
-	eventsV1 "shared/pkg/proto/events/v1"
 
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
+	"order/internal/model"
 	def "order/internal/service"
+	"platform/pkg/kafka"
+	"platform/pkg/logger"
+	eventsV1 "shared/pkg/proto/events/v1"
 )
 
 var _ def.OrderProducerService = (*service)(nil)
-
 
 type service struct {
 	orderPaidProducer kafka.Producer
@@ -47,5 +46,4 @@ func (s *service) ProduceOrderPaid(ctx context.Context, event model.OrderPaidEve
 	}
 
 	return nil
-
 }

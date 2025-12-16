@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/IBM/sarama"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	orderV1API "order/internal/api/order/v1"
 	grpcClients "order/internal/client/grpc"
 	clientInventory "order/internal/client/grpc/inventory/v1"
@@ -21,18 +25,13 @@ import (
 	orderV1 "shared/pkg/openapi/order/v1"
 	inventoryV1 "shared/pkg/proto/inventory/v1"
 	paymentV1 "shared/pkg/proto/payment/v1"
-
-	"github.com/IBM/sarama"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type diContainer struct {
 	orderV1API orderV1.Handler
 
-	orderService 			service.OrderService
-	orderProducerService 	service.OrderProducerService
+	orderService         service.OrderService
+	orderProducerService service.OrderProducerService
 
 	orderRepository repository.OrderRepository
 
@@ -46,7 +45,7 @@ type diContainer struct {
 
 	paymentGRPCConn *grpc.ClientConn
 
-	syncProducer sarama.SyncProducer
+	syncProducer      sarama.SyncProducer
 	orderPaidProducer wrappedKafka.Producer
 }
 
@@ -63,17 +62,16 @@ func (d *diContainer) OrderV1API(ctx context.Context) orderV1.Handler {
 
 func (d *diContainer) OrderService(ctx context.Context) service.OrderService {
 	if d.orderService == nil {
-		d.orderService = orderService.NewService(d.OrderRepository(ctx), 
-		d.InventoryClient(ctx),
-		d.PaymentClient(ctx), 
-		d.OrderProducerService(),
+		d.orderService = orderService.NewService(d.OrderRepository(ctx),
+			d.InventoryClient(ctx),
+			d.PaymentClient(ctx),
+			d.OrderProducerService(),
 		)
 	}
 	return d.orderService
 }
 
-
-func (d *diContainer) OrderProducerService() service.OrderProducerService{
+func (d *diContainer) OrderProducerService() service.OrderProducerService {
 	if d.orderProducerService == nil {
 		d.orderProducerService = orderproducer.NewService(d.OrderPaidProducer())
 	}
@@ -165,14 +163,13 @@ func (d *diContainer) PaymentGRPCConn(ctx context.Context) *grpc.ClientConn {
 	return d.paymentGRPCConn
 }
 
-
 func (d *diContainer) SyncProducer() sarama.SyncProducer {
-	if d.syncProducer == nil{
+	if d.syncProducer == nil {
 		p, err := sarama.NewSyncProducer(
 			config.AppConfig().Kafka.Brokers(),
 			config.AppConfig().OrderPaidProducer.Config(),
 		)
-		if err!=nil {
+		if err != nil {
 			panic(fmt.Sprintf("failed to create sync producer: %s\n", err.Error()))
 		}
 		closer.AddNamed("Kafka Sync producer", func(ctx context.Context) error {
@@ -185,15 +182,14 @@ func (d *diContainer) SyncProducer() sarama.SyncProducer {
 	return d.syncProducer
 }
 
-func (d *diContainer) OrderPaidProducer() wrappedKafka.Producer{
+func (d *diContainer) OrderPaidProducer() wrappedKafka.Producer {
 	if d.orderPaidProducer == nil {
 		d.orderPaidProducer = wrappedKafkaProducer.NewProducer(
-			d.SyncProducer(), 
+			d.SyncProducer(),
 			config.AppConfig().OrderPaidProducer.Topic(),
 			logger.Logger(),
 		)
 	}
 
 	return d.orderPaidProducer
-
 }
