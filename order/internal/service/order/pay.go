@@ -2,10 +2,13 @@ package order
 
 import (
 	"context"
+	"platform/pkg/logger"
+
+	"order/internal/model"
 
 	"github.com/google/uuid"
 	"github.com/samber/lo"
-	"order/internal/model"
+	"go.uber.org/zap"
 )
 
 // TODO: check orderstatus cancel
@@ -35,6 +38,9 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMet
 	defer cancelPay()
 
 	transaction_uuid, err := s.PaymentClient.PayOrder(reqPayCtx, order_uuid.String(), order.UserUUID.String(), paymentMethod)
+	if transaction_uuid == uuid.Nil {
+		return uuid.Nil, err
+	}
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -49,6 +55,24 @@ func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMet
 	err = s.OrderRepository.UpdateOrder(reqUpdateCtx, order)
 	if err != nil {
 		return uuid.Nil, err
+	}
+
+	eventUuid, err := uuid.NewUUID()
+	if err != nil {
+		logger.Error(ctx, "couldn't create event uuid", zap.Error(err))
+		return uuid.Nil, err
+	}
+	//Kafka Producer
+	err = s.orderProducerService.ProduceOrderPaid(ctx, model.OrderPaidEvent{
+		EventUuid:     eventUuid,
+		OrderUuid:     order_uuid,
+		UserUuid:      order.UserUUID,
+		PaymentMethod: int32(paymentMethod),
+		TransactionUuid: transaction_uuid,
+	})
+	if err != nil {
+		logger.Error(ctx, "couldn't produce event transaction uuid")
+		return transaction_uuid, err
 	}
 
 	return transaction_uuid, err

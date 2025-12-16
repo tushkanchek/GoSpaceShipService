@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+
+package events.v1;
+
+
+option go_package = "back/GoSpaceShipService/shared/pkg/proto/events/v1;events_v1";
+
+//Supported payment methods
+enum PaymentMethod {
+    PAYMENT_METHOD_UNSPECIFIED = 0;     
+    PAYMENT_METHOD_CARD = 1;     
+    PAYMENT_METHOD_SBP = 2;       
+    PAYMENT_METHOD_CREDIT_CARD = 3;     
+    PAYMENT_METHOD_INVESTOR_MONEY = 4;        
+} 
+
+
+//Event for kafka comsumer in paid method
+message OrderPaid{
+    string event_uuid = 1;
+    string order_uuid = 2;
+    string user_uuid = 3;
+    PaymentMethod payment_method = 4;
+    string transaction_uuid = 5;
+} 
