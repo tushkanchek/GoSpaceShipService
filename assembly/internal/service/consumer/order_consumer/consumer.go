@@ -1,29 +1,26 @@
 package order_consumer
 
 import (
+	"context"
+
 	kafkaConverter "assembly/internal/converter/kafka"
 	def "assembly/internal/service"
-	"context"
+	"go.uber.org/zap"
 	"platform/pkg/kafka"
 	"platform/pkg/logger"
-
-	"go.uber.org/zap"
 )
-
-
 
 var _ def.ConsumerService = (*service)(nil)
 
-
 type service struct {
 	orderPaidConsumer kafka.Consumer
-	orderPaidDecoder kafkaConverter.OrderPaidDecoder
+	orderPaidDecoder  kafkaConverter.OrderPaidDecoder
 }
 
 func NewService(orderPaidConsumer kafka.Consumer, orderPaidDecoder kafkaConverter.OrderPaidDecoder) *service {
 	return &service{
 		orderPaidConsumer: orderPaidConsumer,
-		orderPaidDecoder: orderPaidDecoder,
+		orderPaidDecoder:  orderPaidDecoder,
 	}
 }
 

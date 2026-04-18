@@ -23,8 +23,7 @@ func NewOrderPaidConsumerConfig() (*orderPaidConsumerConfig, error) {
 	return &orderPaidConsumerConfig{
 		raw: raw,
 	}, nil
-}	
-
+}
 
 func (cfg *orderPaidConsumerConfig) Topic() string {
 	return cfg.raw.Topic

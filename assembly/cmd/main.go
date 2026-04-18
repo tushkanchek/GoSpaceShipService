@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"time"
 
-	"go.uber.org/zap"
 	"assembly/internal/app"
 	"assembly/internal/config"
+	"go.uber.org/zap"
 	"platform/pkg/closer"
 	"platform/pkg/logger"
 )

@@ -12,8 +12,14 @@ import (
 func (a *api) CreateOrder(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.CreateOrderRes, error) {
 	order, err := a.service.CreateOrder(ctx, req.UserUUID, req.PartUuids)
 	if err != nil {
-		if errors.Is(err, model.ErrOrderAlreadyExists) && errors.Is(err, model.ErrEmptyUserUuid) && errors.Is(err, model.ErrEmptyListPartUuids) {
-			return &orderV1.BadRequestError{ // TODO: return make it conflict error
+		if errors.Is(err, model.ErrOrderAlreadyExists) {
+			return &orderV1.InternalServerError{
+				Code:    http.StatusConflict,
+				Message: err.Error(),
+			}, nil
+		}
+		if errors.Is(err, model.ErrEmptyUserUuid) || errors.Is(err, model.ErrEmptyListPartUuids) {
+			return &orderV1.BadRequestError{
 				Code:    http.StatusBadRequest,
 				Message: err.Error(),
 			}, nil

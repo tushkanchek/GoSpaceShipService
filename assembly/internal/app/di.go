@@ -4,23 +4,23 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/IBM/sarama"
 	"assembly/internal/config"
 	kafkaConverter "assembly/internal/converter/kafka"
 	"assembly/internal/converter/kafka/decoder"
 	"assembly/internal/service"
 	"assembly/internal/service/consumer/order_consumer"
+	"github.com/IBM/sarama"
+	"platform/pkg/closer"
 	wrappedKafka "platform/pkg/kafka"
 	wrappedKafkaConsumer "platform/pkg/kafka/consumer"
-	"platform/pkg/closer"
 	"platform/pkg/logger"
 )
 
 type diContainer struct {
-	consumerGroup    sarama.ConsumerGroup
+	consumerGroup     sarama.ConsumerGroup
 	orderPaidConsumer wrappedKafka.Consumer
-	orderPaidDecoder kafkaConverter.OrderPaidDecoder
-	consumerService  service.ConsumerService
+	orderPaidDecoder  kafkaConverter.OrderPaidDecoder
+	consumerService   service.ConsumerService
 }
 
 func NewDiContainer() *diContainer {

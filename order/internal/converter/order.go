@@ -19,7 +19,7 @@ func OrderToApi(order *model.Order) *orderV1.Order {
 
 	return &orderV1.Order{
 		OrderUUID:       order.OrderUUID,
-		UserUUID:        order.OrderUUID,
+		UserUUID:        order.UserUUID,
 		PartUuids:       order.PartUuids,
 		TotalPrice:      float32(order.TotalPrice),
 		TransactionUUID: transactionUUID,

@@ -2,19 +2,16 @@ package config
 
 import (
 	"assembly/internal/config/env"
-
 	"github.com/joho/godotenv"
 )
-
 
 var AppConfig *config
 
 type config struct {
-	Logger LoggerConfig
-	Kafka KafkaConfig
+	Logger            LoggerConfig
+	Kafka             KafkaConfig
 	OrderPaidConsumer OrderPaidConsumerConfig
 }
-
 
 func Load(path ...string) error {
 	err := godotenv.Load(path...)
@@ -26,7 +23,7 @@ func Load(path ...string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	kafkaCfg, err := env.NewKafkaConfig()
 	if err != nil {
 		return err
@@ -38,8 +35,8 @@ func Load(path ...string) error {
 	}
 
 	AppConfig = &config{
-		Logger: loggerCfg,
-		Kafka: kafkaCfg,
+		Logger:            loggerCfg,
+		Kafka:             kafkaCfg,
 		OrderPaidConsumer: orderPaidConsumerCfg,
 	}
 

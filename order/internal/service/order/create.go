@@ -7,16 +7,16 @@ import (
 	model "order/internal/model"
 )
 
-func (s *service) CreateOrder(ctx context.Context, user_uuid uuid.UUID, part_uuids []uuid.UUID) (*model.Order, error) {
-	if user_uuid == uuid.Nil {
+func (s *service) CreateOrder(ctx context.Context, userUUID uuid.UUID, partUUIDs []uuid.UUID) (*model.Order, error) {
+	if userUUID == uuid.Nil {
 		return nil, model.ErrEmptyUserUuid
 	}
-	if len(part_uuids) == 0 {
+	if len(partUUIDs) == 0 {
 		return nil, model.ErrEmptyListPartUuids
 	}
 
-	invPartUuids := make([]string, 0, len(part_uuids))
-	for _, elem := range part_uuids {
+	invPartUuids := make([]string, 0, len(partUUIDs))
+	for _, elem := range partUUIDs {
 		invPartUuids = append(invPartUuids, elem.String())
 	}
 
@@ -26,22 +26,22 @@ func (s *service) CreateOrder(ctx context.Context, user_uuid uuid.UUID, part_uui
 	resp, err := s.InventoryClient.ListParts(reqListCtx, &model.PartsFilter{
 		Uuids: invPartUuids,
 	})
-	if len(resp) == 0 {
-		return nil, model.ErrPartsByUuidsNotFound
-	}
 	if err != nil {
 		return nil, err
 	}
+	if len(resp) == 0 {
+		return nil, model.ErrPartsByUuidsNotFound
+	}
 
-	var totalPrice float64 = 0
+	var totalPrice float64
 	for _, p := range resp {
 		totalPrice += p.Price
 	}
 
 	order := &model.Order{
 		OrderUUID:   uuid.MustParse(uuid.NewString()),
-		UserUUID:    user_uuid,
-		PartUuids:   part_uuids,
+		UserUUID:    userUUID,
+		PartUuids:   partUUIDs,
 		TotalPrice:  totalPrice,
 		OrderStatus: model.OrderStatusPENDINGPAYMENT,
 	}
