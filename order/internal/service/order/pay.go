@@ -11,6 +11,7 @@ import (
 )
 
 // TODO: check orderstatus cancel
+//TODO: need outbox pattern for kafka producer
 func (s *service) PayOrder(ctx context.Context, order_uuid uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
 	if order_uuid == uuid.Nil {
 		return uuid.Nil, model.ErrEmptyOrderUuid

@@ -3,12 +3,17 @@ package order_consumer
 import (
 	"context"
 
-	"go.uber.org/zap"
 	"platform/pkg/kafka"
 	"platform/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
 func (s *service) OrderHandler(ctx context.Context, msg kafka.Message) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	event, err := s.orderPaidDecoder.Decode(msg.Value)
 	if err != nil {
 		logger.Error(ctx, "Failed to decode OrderPaid", zap.Error(err))
