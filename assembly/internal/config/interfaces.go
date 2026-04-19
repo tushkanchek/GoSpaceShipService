@@ -1,6 +1,10 @@
 package config
 
-import "github.com/IBM/sarama"
+import (
+	"time"
+
+	"github.com/IBM/sarama"
+)
 
 type LoggerConfig interface {
 	Level() string
@@ -15,4 +19,25 @@ type OrderPaidConsumerConfig interface {
 	Topic() string
 	GroupID() string
 	Config() *sarama.Config
+}
+
+type OrderAssembledProducerConfig interface {
+	Topic() string
+	Config() *sarama.Config
+}
+
+type DLQProducerConfig interface {
+	Topic() string
+	Config() *sarama.Config
+}
+
+type RetryConfig interface {
+	MaxRetries() int
+	InitialDelay() time.Duration
+	MaxDelay() time.Duration
+	BackoffMultiplier() float64
+}
+
+type TestingConfig interface {
+	FailProduceForTesting() bool
 }

@@ -172,7 +172,7 @@ func (d *diContainer) SyncProducer() sarama.SyncProducer {
 		if err != nil {
 			panic(fmt.Sprintf("failed to create sync producer: %s\n", err.Error()))
 		}
-		closer.AddNamed("Kafka Sync producer", func(ctx context.Context) error {
+		closer.AddNamed("Kafka Sync order paid producer", func(ctx context.Context) error {
 			return p.Close()
 		})
 

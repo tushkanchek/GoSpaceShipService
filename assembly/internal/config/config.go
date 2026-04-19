@@ -2,15 +2,20 @@ package config
 
 import (
 	"assembly/internal/config/env"
+
 	"github.com/joho/godotenv"
 )
 
 var AppConfig *config
 
 type config struct {
-	Logger            LoggerConfig
-	Kafka             KafkaConfig
-	OrderPaidConsumer OrderPaidConsumerConfig
+	Logger                 LoggerConfig
+	Kafka                  KafkaConfig
+	OrderPaidConsumer      OrderPaidConsumerConfig
+	OrderAssembledProducer OrderAssembledProducerConfig
+	DLQProducer            DLQProducerConfig
+	Retry                  RetryConfig
+	Testing                TestingConfig
 }
 
 func Load(path ...string) error {
@@ -34,10 +39,31 @@ func Load(path ...string) error {
 		return err
 	}
 
+	orderAssembledProducerCfg, err := env.NewOrderAssembledProducerConfig()
+	if err != nil {
+		return err
+	}
+
+	dlqProducerCfg, err := env.NewDLQProducerConfig()
+	if err != nil {
+		return err
+	}
+
+	retryCfg, err := env.NewRetryConfig()
+	if err != nil {
+		return err
+	}
+
+	testingCfg := env.LoadTestingConfig()
+
 	AppConfig = &config{
-		Logger:            loggerCfg,
-		Kafka:             kafkaCfg,
-		OrderPaidConsumer: orderPaidConsumerCfg,
+		Logger:                 loggerCfg,
+		Kafka:                  kafkaCfg,
+		OrderPaidConsumer:      orderPaidConsumerCfg,
+		OrderAssembledProducer: orderAssembledProducerCfg,
+		DLQProducer:            dlqProducerCfg,
+		Retry:                  retryCfg,
+		Testing:                testingCfg,
 	}
 
 	return nil

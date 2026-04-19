@@ -5,22 +5,35 @@ import (
 
 	kafkaConverter "assembly/internal/converter/kafka"
 	def "assembly/internal/service"
-	"go.uber.org/zap"
 	"platform/pkg/kafka"
 	"platform/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
-var _ def.ConsumerService = (*service)(nil)
+var _ def.AssemblyConsumerService = (*service)(nil)
 
 type service struct {
-	orderPaidConsumer kafka.Consumer
-	orderPaidDecoder  kafkaConverter.OrderPaidDecoder
+	orderPaidConsumer      kafka.Consumer
+	orderPaidDecoder       kafkaConverter.OrderPaidDecoder
+	orderAssembledProducer def.AssemblyProducerService
+	dlqProducer            kafka.Producer
+	dlqEncoder             kafkaConverter.DLQEventEncoder
 }
 
-func NewService(orderPaidConsumer kafka.Consumer, orderPaidDecoder kafkaConverter.OrderPaidDecoder) *service {
+func NewService(
+	orderPaidConsumer kafka.Consumer,
+	orderPaidDecoder kafkaConverter.OrderPaidDecoder,
+	orderAssembledProducer def.AssemblyProducerService,
+	dlqProducer kafka.Producer,
+	dlqEncoder kafkaConverter.DLQEventEncoder,
+) *service {
 	return &service{
-		orderPaidConsumer: orderPaidConsumer,
-		orderPaidDecoder:  orderPaidDecoder,
+		orderPaidConsumer:      orderPaidConsumer,
+		orderPaidDecoder:       orderPaidDecoder,
+		orderAssembledProducer: orderAssembledProducer,
+		dlqProducer:            dlqProducer,
+		dlqEncoder:             dlqEncoder,
 	}
 }
 

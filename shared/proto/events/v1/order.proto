@@ -24,3 +24,11 @@ message OrderPaid{
     PaymentMethod payment_method = 4;
     string transaction_uuid = 5;
 } 
+
+//Event for kafka producer when ship is assembled
+message OrderAssembled{
+    string event_uuid = 1;
+    string order_uuid = 2;
+    string user_uuid = 3;
+    int32 build_time_sec = 4;
+}

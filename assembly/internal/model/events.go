@@ -9,3 +9,10 @@ type OrderPaidEvent struct {
 	PaymentMethod   string
 	TransactionUuid uuid.UUID
 }
+
+type OrderAssembledEvent struct {
+	EventUuid    uuid.UUID
+	OrderUuid    uuid.UUID
+	UserUuid     uuid.UUID
+	BuildTimeSec int32
+}

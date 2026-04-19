@@ -1,12 +1,15 @@
 package service
 
-import "context"
+import (
+	"context"
 
-type ConsumerService interface {
+	"assembly/internal/model"
+)
+
+type AssemblyConsumerService interface {
 	RunConsumer(ctx context.Context) error
 }
 
-
-type ProducerService interface {
-	RunProducer(ctx context.Context) error
+type AssemblyProducerService interface {
+	ProduceOrderAssembled(ctx context.Context, event model.OrderAssembledEvent) error
 }

@@ -154,6 +154,75 @@ func (x *OrderPaid) GetTransactionUuid() string {
 	return ""
 }
 
+// Event for kafka producer when ship is assembled
+type OrderAssembled struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EventUuid     string                 `protobuf:"bytes,1,opt,name=event_uuid,json=eventUuid,proto3" json:"event_uuid,omitempty"`
+	OrderUuid     string                 `protobuf:"bytes,2,opt,name=order_uuid,json=orderUuid,proto3" json:"order_uuid,omitempty"`
+	UserUuid      string                 `protobuf:"bytes,3,opt,name=user_uuid,json=userUuid,proto3" json:"user_uuid,omitempty"`
+	BuildTimeSec  int32                  `protobuf:"varint,4,opt,name=build_time_sec,json=buildTimeSec,proto3" json:"build_time_sec,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OrderAssembled) Reset() {
+	*x = OrderAssembled{}
+	mi := &file_events_v1_order_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderAssembled) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderAssembled) ProtoMessage() {}
+
+func (x *OrderAssembled) ProtoReflect() protoreflect.Message {
+	mi := &file_events_v1_order_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderAssembled.ProtoReflect.Descriptor instead.
+func (*OrderAssembled) Descriptor() ([]byte, []int) {
+	return file_events_v1_order_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *OrderAssembled) GetEventUuid() string {
+	if x != nil {
+		return x.EventUuid
+	}
+	return ""
+}
+
+func (x *OrderAssembled) GetOrderUuid() string {
+	if x != nil {
+		return x.OrderUuid
+	}
+	return ""
+}
+
+func (x *OrderAssembled) GetUserUuid() string {
+	if x != nil {
+		return x.UserUuid
+	}
+	return ""
+}
+
+func (x *OrderAssembled) GetBuildTimeSec() int32 {
+	if x != nil {
+		return x.BuildTimeSec
+	}
+	return 0
+}
+
 var File_events_v1_order_proto protoreflect.FileDescriptor
 
 const file_events_v1_order_proto_rawDesc = "" +
@@ -166,7 +235,14 @@ const file_events_v1_order_proto_rawDesc = "" +
 	"order_uuid\x18\x02 \x01(\tR\torderUuid\x12\x1b\n" +
 	"\tuser_uuid\x18\x03 \x01(\tR\buserUuid\x12?\n" +
 	"\x0epayment_method\x18\x04 \x01(\x0e2\x18.events.v1.PaymentMethodR\rpaymentMethod\x12)\n" +
-	"\x10transaction_uuid\x18\x05 \x01(\tR\x0ftransactionUuid*\xa3\x01\n" +
+	"\x10transaction_uuid\x18\x05 \x01(\tR\x0ftransactionUuid\"\x91\x01\n" +
+	"\x0eOrderAssembled\x12\x1d\n" +
+	"\n" +
+	"event_uuid\x18\x01 \x01(\tR\teventUuid\x12\x1d\n" +
+	"\n" +
+	"order_uuid\x18\x02 \x01(\tR\torderUuid\x12\x1b\n" +
+	"\tuser_uuid\x18\x03 \x01(\tR\buserUuid\x12$\n" +
+	"\x0ebuild_time_sec\x18\x04 \x01(\x05R\fbuildTimeSec*\xa3\x01\n" +
 	"\rPaymentMethod\x12\x1e\n" +
 	"\x1aPAYMENT_METHOD_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13PAYMENT_METHOD_CARD\x10\x01\x12\x16\n" +
@@ -187,10 +263,11 @@ func file_events_v1_order_proto_rawDescGZIP() []byte {
 }
 
 var file_events_v1_order_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_events_v1_order_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_events_v1_order_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_events_v1_order_proto_goTypes = []any{
-	(PaymentMethod)(0), // 0: events.v1.PaymentMethod
-	(*OrderPaid)(nil),  // 1: events.v1.OrderPaid
+	(PaymentMethod)(0),     // 0: events.v1.PaymentMethod
+	(*OrderPaid)(nil),      // 1: events.v1.OrderPaid
+	(*OrderAssembled)(nil), // 2: events.v1.OrderAssembled
 }
 var file_events_v1_order_proto_depIdxs = []int32{
 	0, // 0: events.v1.OrderPaid.payment_method:type_name -> events.v1.PaymentMethod
@@ -212,7 +289,7 @@ func file_events_v1_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_events_v1_order_proto_rawDesc), len(file_events_v1_order_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
