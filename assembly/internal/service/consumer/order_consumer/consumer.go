@@ -5,10 +5,9 @@ import (
 
 	kafkaConverter "assembly/internal/converter/kafka"
 	def "assembly/internal/service"
+	"go.uber.org/zap"
 	"platform/pkg/kafka"
 	"platform/pkg/logger"
-
-	"go.uber.org/zap"
 )
 
 var _ def.AssemblyConsumerService = (*service)(nil)

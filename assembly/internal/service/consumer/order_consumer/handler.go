@@ -1,24 +1,20 @@
 package order_consumer
 
 import (
-	"assembly/internal/config"
-	"assembly/internal/model"
 	"context"
 	"errors"
 	"math"
 	"time"
 
-	"platform/pkg/kafka"
-	"platform/pkg/logger"
-
+	"assembly/internal/config"
+	"assembly/internal/model"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	//"google.golang.org/protobuf/proto"
+	"platform/pkg/kafka"
+	"platform/pkg/logger"
 )
 
-var (
-	BuildTime = 10 * time.Second
-)
+var BuildTime = 10 * time.Second
 
 func (s *service) OrderHandler(ctx context.Context, msg kafka.Message) error {
 	if err := ctx.Err(); err != nil {
@@ -41,7 +37,7 @@ func (s *service) OrderHandler(ctx context.Context, msg kafka.Message) error {
 		zap.String("transaction_uuid", event.TransactionUuid.String()),
 	)
 
-	//Produce OrderAssembled event and 10 seconds wait to simulate assembly time
+	// Produce OrderAssembled event and 10 seconds wait to simulate assembly time
 	start := time.Now()
 
 	timer := time.NewTimer(BuildTime)

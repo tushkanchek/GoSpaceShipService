@@ -2,7 +2,6 @@ package config
 
 import (
 	"assembly/internal/config/env"
-
 	"github.com/joho/godotenv"
 )
 

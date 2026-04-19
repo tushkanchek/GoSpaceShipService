@@ -2,7 +2,6 @@ package order_assembled_producer
 
 import (
 	"context"
-	//"time"
 
 	kafkaConverter "assembly/internal/converter/kafka"
 	"assembly/internal/model"
@@ -38,12 +37,12 @@ func (s *service) ProduceOrderAssembled(ctx context.Context, event model.OrderAs
 
 	// select {
 	// case <-timer.C:
-		err = s.orderAssembledProducer.Send(ctx, []byte(event.EventUuid.String()), assembly)
-		if err != nil {
-			logger.Error(ctx, "Failed to publish OrderAssembled", zap.Error(err))
-			return err
-		}
-		return nil
+	err = s.orderAssembledProducer.Send(ctx, []byte(event.EventUuid.String()), assembly)
+	if err != nil {
+		logger.Error(ctx, "Failed to publish OrderAssembled", zap.Error(err))
+		return err
+	}
+	return nil
 	// case <-ctx.Done():
 	// 	logger.Info(ctx, "stopping assembly wait due to context cancellation")
 	// 	return ctx.Err()

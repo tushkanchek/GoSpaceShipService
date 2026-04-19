@@ -10,15 +10,13 @@ import (
 	"assembly/internal/converter/kafka/encoder"
 	"assembly/internal/service"
 	"assembly/internal/service/consumer/order_consumer"
+	orderAssembledProducer "assembly/internal/service/producer/order_assembled_producer"
+	"github.com/IBM/sarama"
 	"platform/pkg/closer"
 	wrappedKafka "platform/pkg/kafka"
 	wrappedKafkaConsumer "platform/pkg/kafka/consumer"
 	wrappedKafkaProducer "platform/pkg/kafka/producer"
 	"platform/pkg/logger"
-
-	"github.com/IBM/sarama"
-
-	orderAssembledProducer "assembly/internal/service/producer/order_assembled_producer"
 )
 
 type diContainer struct {

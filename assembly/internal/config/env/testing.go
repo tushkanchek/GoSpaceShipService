@@ -19,7 +19,11 @@ func (c *testingConfig) FailProduceForTesting() bool {
 
 func LoadTestingConfig() TestingConfig {
 	failStr := os.Getenv("TEST_FAIL_PRODUCE")
-	fail, _ := strconv.ParseBool(failStr)
+	fail, err := strconv.ParseBool(failStr)
+	if err != nil {
+		// Если не установлена или некорректная, по умолчанию false
+		fail = false
+	}
 	return &testingConfig{
 		failProduceForTesting: fail,
 	}
