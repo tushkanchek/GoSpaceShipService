@@ -38,13 +38,4 @@ jobs:
       modules: ${{ needs.extract-vars.outputs.modules }}
       go-version: ${{ needs.extract-vars.outputs.go-version }}
 
-  coverage:
-    if: github.event_name == 'push'
-    uses: ./.github/workflows/test-coverage-reusable.yml
-    needs: [test, extract-vars]
-    with:
-      modules: ${{ needs.extract-vars.outputs.modules }}
-      go-version: ${{ needs.extract-vars.outputs.go-version }}
-      gist-id: "084c08f8beefdcc821718cb28a87702a"
-    secrets:
-      GIST_SECRET: ${{ secrets.GIST_SECRET }}
+
