@@ -77,14 +77,6 @@ func (a *App) initListener(_ context.Context) error {
 	if err != nil {
 		return err
 	}
-	closer.AddNamed("TCP listener", func(ctx context.Context) error {
-		lerr := listener.Close()
-		if lerr != nil {
-			return lerr
-		}
-
-		return nil
-	})
 
 	a.listener = listener
 
@@ -94,8 +86,18 @@ func (a *App) initListener(_ context.Context) error {
 func (a *App) initGRPCServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
 	closer.AddNamed("gRPC server", func(ctx context.Context) error {
-		a.grpcServer.GracefulStop()
-		return nil
+		done := make(chan struct{})
+		go func() {
+			a.grpcServer.GracefulStop()
+			close(done)
+		}()
+		select {
+		case <-done:
+			return nil
+		case <-ctx.Done():
+			a.grpcServer.Stop()
+			return ctx.Err()
+		}
 	})
 	reflection.Register(a.grpcServer)
 
