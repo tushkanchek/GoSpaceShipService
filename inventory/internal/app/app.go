@@ -77,14 +77,6 @@ func (a *App) initListener(_ context.Context) error {
 	if err != nil {
 		return err
 	}
-	closer.AddNamed("TCP listener", func(ctx context.Context) error {
-		lerr := listener.Close()
-		if lerr != nil {
-			return lerr
-		}
-
-		return nil
-	})
 
 	a.listener = listener
 
