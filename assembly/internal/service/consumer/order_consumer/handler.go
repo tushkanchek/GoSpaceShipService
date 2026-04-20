@@ -10,13 +10,13 @@ import (
 	"assembly/internal/model"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"platform/pkg/kafka"
+	"platform/pkg/kafka/consumer"
 	"platform/pkg/logger"
 )
 
 var BuildTime = 10 * time.Second
 
-func (s *service) OrderHandler(ctx context.Context, msg kafka.Message) error {
+func (s *service) OrderHandler(ctx context.Context, msg consumer.Message) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}

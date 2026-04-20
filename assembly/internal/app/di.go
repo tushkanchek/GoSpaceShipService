@@ -17,6 +17,7 @@ import (
 	wrappedKafkaConsumer "platform/pkg/kafka/consumer"
 	wrappedKafkaProducer "platform/pkg/kafka/producer"
 	"platform/pkg/logger"
+	"platform/pkg/middleware/kafka"
 )
 
 type diContainer struct {
@@ -63,6 +64,7 @@ func (d *diContainer) OrderPaidConsumer(ctx context.Context) wrappedKafka.Consum
 			d.ConsumerGroup(ctx),
 			[]string{config.AppConfig.OrderPaidConsumer.Topic()},
 			logger.Logger(),
+			kafka.Logging(logger.Logger()),
 		)
 	}
 	return d.orderPaidConsumer

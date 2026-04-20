@@ -2,13 +2,12 @@ package kafka
 
 import (
 	"context"
+
+	"platform/pkg/kafka/consumer"
 )
 
-// MessageHandler — обработчик сообщений.
-type MessageHandler func(ctx context.Context, msg Message) error
-
 type Consumer interface {
-	Consume(ctx context.Context, handler MessageHandler) error
+	Consume(ctx context.Context, handler consumer.MessageHandler) error
 }
 
 type Producer interface {
