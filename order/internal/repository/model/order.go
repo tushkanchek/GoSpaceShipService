@@ -73,6 +73,7 @@ const (
 	OrderStatusPENDINGPAYMENT OrderStatus = "PENDING_PAYMENT"
 	OrderStatusPAID           OrderStatus = "PAID"
 	OrderStatusCANCELLED      OrderStatus = "CANCELLED"
+	OrderStatusASSEMBLED      OrderStatus = "ASSEMBLED"
 )
 
 // Реализуем интерфейс Scaner, для извлечения OrderStatus из postgres
@@ -86,6 +87,8 @@ func (o *OrderStatus) Scan(src any) error {
 			*o = OrderStatusPAID
 		case "CANCELLED":
 			*o = OrderStatusCANCELLED
+		case "ASSEMBLED":
+			*o = OrderStatusASSEMBLED
 		default:
 			*o = OrderStatusUNKNOWN
 		}

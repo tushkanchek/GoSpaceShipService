@@ -6,10 +6,12 @@ OrderStatus:
     - PENDING_PAYMENT
     - PAID
     - CANCELLED
+    - ASSEMBLED
   x-enum-descriptions:
     - Неизвестный способ оплаты
     - Оплата банковской картой
     - Оплата через СБП
     - Оплата кредитной картой
     - Оплата средствами инвестора
+    - Заказ собран
   example: PENDING_PAYMENT

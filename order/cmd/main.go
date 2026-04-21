@@ -36,7 +36,7 @@ func main() {
 
 	err = a.Run(appCtx)
 	if err != nil {
-		logger.Error(appCtx, "failed to run HTTP server: %v", zap.Error(err))
+		logger.Error(appCtx, "failed to run app: %v", zap.Error(err))
 		return
 	}
 }

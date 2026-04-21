@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/IBM/sarama"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	orderV1API "order/internal/api/order/v1"
 	grpcClients "order/internal/client/grpc"
 	clientInventory "order/internal/client/grpc/inventory/v1"
 	clientPayment "order/internal/client/grpc/payment/v1"
 	"order/internal/config"
+	kafkaConverter "order/internal/converter/kafka"
+	"order/internal/converter/kafka/decoder"
 	"order/internal/repository"
 	orderRepository "order/internal/repository/order"
 	"order/internal/service"
@@ -20,33 +18,46 @@ import (
 	orderproducer "order/internal/service/producer/order_producer"
 	"platform/pkg/closer"
 	wrappedKafka "platform/pkg/kafka"
+	wrappedKafkaConsumer "platform/pkg/kafka/consumer"
 	wrappedKafkaProducer "platform/pkg/kafka/producer"
 	"platform/pkg/logger"
+	"platform/pkg/middleware/kafka"
 	orderV1 "shared/pkg/openapi/order/v1"
 	inventoryV1 "shared/pkg/proto/inventory/v1"
 	paymentV1 "shared/pkg/proto/payment/v1"
+
+	"github.com/IBM/sarama"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	orderConsumer "order/internal/service/consumer/order_consumer"
 )
 
 type diContainer struct {
-	orderV1API orderV1.Handler
+	orderV1API 					orderV1.Handler
 
-	orderService         service.OrderService
-	orderProducerService service.OrderProducerService
+	orderService         		service.OrderService
+	orderProducerService 		service.OrderProducerService
 
-	orderRepository repository.OrderRepository
+	orderRepository 			repository.OrderRepository
 
-	inventoryClient grpcClients.InventoryClient
+	inventoryClient 			grpcClients.InventoryClient
 
-	paymentClient grpcClients.PaymentClient
+	paymentClient 				grpcClients.PaymentClient
 
-	postgresPool *pgxpool.Pool
+	postgresPool 				*pgxpool.Pool
 
-	inventoryGRPCConn *grpc.ClientConn
+	inventoryGRPCConn 			*grpc.ClientConn
 
-	paymentGRPCConn *grpc.ClientConn
+	paymentGRPCConn 			*grpc.ClientConn
 
-	syncProducer      sarama.SyncProducer
-	orderPaidProducer wrappedKafka.Producer
+	consumerGroup 				sarama.ConsumerGroup
+	orderAssembledConsumer 		wrappedKafka.Consumer
+	orderAssembledDecoder  		kafkaConverter.OrderAssembledDecoder
+	consumerService   			service.OrderConsumerService
+
+	syncProducer      			sarama.SyncProducer
+	orderPaidProducer 			wrappedKafka.Producer
 }
 
 func NewDiContainer() *diContainer {
@@ -70,6 +81,58 @@ func (d *diContainer) OrderService(ctx context.Context) service.OrderService {
 	}
 	return d.orderService
 }
+
+func (d *diContainer) ConsumerGroup(_ context.Context) sarama.ConsumerGroup {
+	if d.consumerGroup == nil {
+		group, err := sarama.NewConsumerGroup(
+			config.AppConfig().Kafka.Brokers(),
+			config.AppConfig().OrderAssembledConsumer.GroupID(),
+			config.AppConfig().OrderAssembledConsumer.Config(),
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to create consumer group: %w", err))
+		}
+
+		closer.AddNamed("Kafka consumer group", func(ctx context.Context) error {
+			return group.Close()
+		})
+
+		d.consumerGroup = group
+	}
+	return d.consumerGroup
+}
+
+func (d *diContainer) OrderAssembledConsumer(_ context.Context) wrappedKafka.Consumer {
+	if d.orderAssembledConsumer == nil {
+		d.orderAssembledConsumer = wrappedKafkaConsumer.NewConsumer(
+			d.ConsumerGroup(context.Background()),
+			[]string{config.AppConfig().OrderAssembledConsumer.Topic()},
+			logger.Logger(),
+			kafka.Logging(logger.Logger()),
+		)
+	}
+	return d.orderAssembledConsumer
+}
+
+func (d *diContainer) OrderAssembledDecoder() kafkaConverter.OrderAssembledDecoder {
+	if d.orderAssembledDecoder == nil {
+		d.orderAssembledDecoder = decoder.NewDecoder()
+	}
+	return d.orderAssembledDecoder
+}
+
+
+func (d *diContainer) ConsumerService(ctx context.Context) service.OrderConsumerService {
+	if d.consumerService == nil {
+		d.consumerService = orderConsumer.NewService(
+			d.OrderAssembledConsumer(ctx),
+			d.OrderAssembledDecoder(),
+			d.OrderService(ctx),
+		)
+	}
+	return d.consumerService
+}
+
 
 func (d *diContainer) OrderProducerService() service.OrderProducerService {
 	if d.orderProducerService == nil {

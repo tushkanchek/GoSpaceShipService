@@ -6,17 +6,19 @@ import (
 	"net/http"
 	"time"
 
+	"order/internal/config"
+	"order/internal/migrator"
+	"platform/pkg/closer"
+	"platform/pkg/logger"
+	orderV1 "shared/pkg/openapi/order/v1"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
-	"order/internal/config"
-	"order/internal/migrator"
-	"platform/pkg/closer"
-	"platform/pkg/logger"
-	orderV1 "shared/pkg/openapi/order/v1"
+	"golang.org/x/sync/errgroup"
 )
 
 type App struct {
@@ -37,8 +39,22 @@ func New(ctx context.Context) (*App, error) {
 }
 
 func (a *App) Run(ctx context.Context) error {
-	return a.runHTTPServer(ctx)
+	g, ctx := errgroup.WithContext(ctx)
+
+	// HTTP server
+	g.Go(func() error {
+		return a.runHTTPServer(ctx)
+	})
+
+	// Kafka consumer
+	g.Go(func() error {
+		return a.runConsumer(ctx)
+	})
+
+	return g.Wait()
 }
+
+
 
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
@@ -135,18 +151,48 @@ func (a *App) initHTTPServer(_ context.Context) error {
 	return nil
 }
 
+
+
 func (a *App) runHTTPServer(ctx context.Context) error {
 	logger.Info(ctx, fmt.Sprintf("🚀 HTTP OrderService server listening on %s", config.AppConfig().OrderHTTP.Adress()))
+	errCh := make(chan error, 1)
 
-	// Start server in goroutine
 	go func() {
 		err := a.httpServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			logger.Error(ctx, "❌ HTTP server error: %v", zap.Error(err))
+			errCh <- err
 		}
 	}()
 
-	// Wait for context cancellation (signal)
-	<-ctx.Done()
-	return nil
+	select {
+	case <-ctx.Done():
+		logger.Error(ctx, "❌ Context done error %v", zap.Error(ctx.Err()))
+		return nil
+	case err := <-errCh:
+		logger.Error(ctx, "❌ HTTP server error: %v", zap.Error(err))
+		return err
+	}
+}
+
+
+func (a *App) runConsumer(ctx context.Context) error {
+	logger.Info(ctx, "🚀 Kafka consumer started")
+
+	errCh := make(chan error, 1)
+
+	go func() {
+		err := a.diContainer.ConsumerService(ctx).RunConsumer(ctx)
+		if err != nil {
+			errCh <- err
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		logger.Info(ctx, "🛑 Kafka consumer shutdown signal received")
+		return nil
+	case err := <-errCh:
+		logger.Error(ctx, "❌ Kafka consumer error", zap.Error(err))
+		return err
+	}
 }

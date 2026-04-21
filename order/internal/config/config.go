@@ -15,6 +15,7 @@ type config struct {
 	PaymentGRPC       PaymentGRPCConfig
 	Kafka             KafkaConfig
 	OrderPaidProducer OrderPaidProducerConfig
+	OrderAssembledConsumer OrderAssembledConsumerConfig
 }
 
 func Load(path ...string) error {
@@ -58,6 +59,10 @@ func Load(path ...string) error {
 		return err
 	}
 
+	orderAssembledConsumerCfg, err := env.NewOrderAssembledConsumerConfig()
+	if err != nil {
+		return err
+	}
 	appConfig = &config{
 		Logger:            loggerCfg,
 		OrderHTTP:         orderHTTPCfg,
@@ -66,6 +71,7 @@ func Load(path ...string) error {
 		PaymentGRPC:       paymentGRPCCfg,
 		Kafka:             kafkaCfg,
 		OrderPaidProducer: orderPaidProducerCfg,
+		OrderAssembledConsumer: orderAssembledConsumerCfg,
 	}
 	return nil
 }

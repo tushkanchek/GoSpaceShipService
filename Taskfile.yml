@@ -683,3 +683,23 @@ tasks:
           fi
         done
         exit $ERR
+
+  assembly:
+    cmds:
+      - go run ./assembly/cmd/main.go
+
+  order:
+    cmds:
+      - go run ./order/cmd/main.go
+
+  inventory:
+    cmds:
+      - go run ./inventory/cmd/main.go
+
+  payment:
+    cmds:
+      - go run ./payment/cmd/main.go
+
+  notification:
+    cmds:
+      - go run ./notification/cmd/main.go
